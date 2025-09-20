@@ -1,13 +1,24 @@
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
+import Header from "../header/Header";
+import Sidebar from "../sidebar/Sidebar";
 
 export default function UserLayout() {
   return (
     <>
-      <Header />
-      <Sidebar />
-      <Outlet /> {/* 여기서 각 페이지 컴포넌트가 렌더링됨 */}
+      <div
+        style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+      >
+        {/* 상단 헤더 전체폭 */}
+        <Header />
+
+        {/* 헤더 아래에 사이드바 + 본문 나란히 */}
+        <div style={{ flex: 1, display: "flex" }}>
+          <Sidebar />
+          <main style={{ flex: 1, padding: "1rem" }}>
+            <Outlet />
+          </main>
+        </div>
+      </div>
     </>
   );
 }
