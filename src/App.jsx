@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import UserLayout from "./common/layout/UserLayout";
 import AdminLayout from "./common/layout/AdminLayout";
 import UserMain from "./components/userInterface/main/UserMain";
+import LogIn from "./components/userInterface/member/LogIn";
 
 function App() {
   const [count, setCount] = useState(0);
