@@ -1,0 +1,88 @@
+.LeagueTeamTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a2980;
+  margin: 36px 0 16px 4px;
+  letter-spacing: -0.5px;
+}
+
+/* LiveTvIcon SVG 스타일 */
+/* 아이콘 배경 및 정렬 */
+.LeagueNameWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 18px;
+  background: #f8f8f8;
+  padding: 24px 32px;
+  border-radius: 16px;
+  width: fit-content;
+  box-shadow: 0 6px 24px 0 rgba(42, 67, 101, 0.18), 0 1.5px 4px 0 rgba(42, 67, 101, 0.10);
+}
+
+.TvIconWrap {
+  background: linear-gradient(135deg, #6a8dff 0%, #a259ff 100%);
+  border-radius: 12px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.LiveTvIcon {
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+}
+
+.LeagueName {
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #1a2980 0%, #a259ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.explain {
+  font-size: 1.1rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ */
+.CalendarWrap{
+    display: flex;
+    align-items: center;
+    width: fit-content;
+
+    margin-top: 5px;
+      
+    border-radius: 16px;
+    background: #f8f8f8;
+    box-shadow: 0 6px 24px 0 rgba(42, 67, 101, 0.18), 0 1.5px 4px 0 rgba(42, 67, 101, 0.10);
+
+}
+
+.CalendarTodayIcon{
+    padding: 24px 32px;
+    color: #2e45fa;
+}
+
+.TodayMatchTitle {
+  font-family: 'Montserrat';
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: #222;
+  margin-left: 8px;
+  letter-spacing: -0.5px;
+
+  position: relative;
+  left: -20px;
+}
+
