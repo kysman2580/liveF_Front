@@ -1,0 +1,685 @@
+
+.chat-header {
+  background: linear-gradient(120deg, #8f91f1 0%, #8f91f1 100%);
+  border-radius: 18px 18px 0 0;
+  padding: 22px 28px 12px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.06);
+}
+.chat-title {
+  font-size: 1.22rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+  letter-spacing: -0.5px;
+}
+.chat-match {
+  font-size: 1.04rem;
+  color: #e0e7ff;
+  font-weight: 500;
+}
+.chat-messages {
+  flex: 1 1 0;
+  background: #f8fafc;
+  color: #222;
+  border-radius: 0 0 0 0;
+  padding: 18px 22px 10px 22px;
+  overflow-y: auto;
+  min-height: 120px;
+  max-height: 260px;
+}
+.chat-msg {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.chat-user {
+  font-weight: 700;
+  color: #6366f1;
+  margin-right: 4px;
+  font-size: 1.04rem;
+}
+.chat-text {
+  background: #fff;
+  color: #222;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 1.07rem;
+  box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.06);
+}
+.chat-time {
+  font-size: 0.93rem;
+  color: #94a3b8;
+  margin-left: 2px;
+}
+.chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px 0 22px;
+}
+.chat-input {
+  flex: 1 1 0;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 16px;
+  font-size: 1.07rem;
+  background: #f3f4f6;
+  color: #222;
+  outline: none;
+  box-shadow: 0 1px 2px 0 rgba(42, 67, 101, 0.04);
+}
+.chat-input:disabled {
+  background: #e5e7eb;
+  color: #aaa;
+}
+.chat-send-btn {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 1.22rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  box-shadow: 0 1px 2px 0 rgba(42, 67, 101, 0.04);
+}
+.chat-send-btn:disabled {
+  background: #c7d2fe;
+  color: #fff;
+  cursor: not-allowed;
+}
+.chat-login-notice {
+  margin-top: 10px;
+  text-align: center;
+}
+.chat-login-btn {
+  background: #fff;
+  color: #6366f1;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 22px;
+  font-size: 1.07rem;
+  font-weight: 700;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+  box-shadow: 0 1px 2px 0 rgba(42, 67, 101, 0.04);
+}
+.chat-login-btn:hover {
+  background: #e0e7ff;
+}
+.chat-login-cancel {
+  color: #555;
+  background: #f3f4f6;
+}
+
+/* 로그인 모달 */
+.login-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 44px 32px 44px;
+  box-shadow: 0 8px 32px 0 rgba(42, 67, 101, 0.18);
+  text-align: center;
+  min-width: 300px;
+}
+.login-modal h3 {
+  font-size: 1.22rem;
+  font-weight: 800;
+  margin-bottom: 22px;
+  color: #222;
+}
+/* LiveMatchCard + 채팅 UI 가로 배치 */
+.LiveMatchRow {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
+/* 채팅 박스 */
+.live-chat-box {
+  width: 340px;
+  background: linear-gradient(120deg, #6366f1 0%, #3b82f6 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px 0 rgba(42, 67, 101, 0.10);
+  padding: 0 0 18px 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+  color: #fff;
+}
+.chat-header {
+  background: linear-gradient(120deg, #6366f1 0%, #3b82f6 100%);
+  border-radius: 18px 18px 0 0;
+  padding: 18px 24px 10px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.chat-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.chat-match {
+  font-size: 1.02rem;
+  color: #e0e7ff;
+}
+.chat-messages {
+  flex: 1 1 0;
+  background: #f8fafc;
+  color: #222;
+  border-radius: 0 0 0 0;
+  padding: 16px 18px 8px 18px;
+  overflow-y: auto;
+  min-height: 120px;
+  max-height: 220px;
+}
+.chat-msg {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.chat-user {
+  font-weight: 700;
+  color: #6366f1;
+  margin-right: 4px;
+}
+.chat-text {
+  background: #fff;
+  color: #222;
+  border-radius: 12px;
+  padding: 7px 14px;
+  font-size: 1.05rem;
+  box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.06);
+}
+.chat-time {
+  font-size: 0.92rem;
+  color: #94a3b8;
+  margin-left: 2px;
+}
+.chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px 0 18px;
+}
+.chat-input {
+  flex: 1 1 0;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 1.05rem;
+  background: #f3f4f6;
+  color: #222;
+  outline: none;
+}
+.chat-input:disabled {
+  background: #e5e7eb;
+  color: #aaa;
+}
+.chat-send-btn {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.chat-send-btn:disabled {
+  background: #c7d2fe;
+  color: #fff;
+  cursor: not-allowed;
+}
+.chat-login-notice {
+  margin-top: 8px;
+  text-align: center;
+}
+.chat-login-btn {
+  background: #fff;
+  color: #6366f1;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 18px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.chat-login-btn:hover {
+  background: #e0e7ff;
+}
+.chat-login-cancel {
+  color: #555;
+  background: #f3f4f6;
+}
+
+/* 로그인 모달 */
+.login-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 38px 28px 38px;
+  box-shadow: 0 8px 32px 0 rgba(42, 67, 101, 0.18);
+  text-align: center;
+  min-width: 280px;
+}
+.login-modal h3 {
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #222;
+}
+.lmc-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 7px;
+  vertical-align: middle;
+}
+.lmc-dot-blue {
+  background: #3b82f6;
+}
+.lmc-dot-green {
+  background: #22c55e;
+}
+.lmc-dot-yellow {
+  background: #eab308;
+}
+.lmc-info-row {
+  display: flex;
+  gap: 28px;
+  margin-top: 8px;
+  margin-left: 4px;
+  align-items: center;
+}
+.lmc-info {
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.LiveMatchCard {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px 0 rgba(42, 67, 101, 0.08);
+  padding: 28px 32px 18px 32px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: box-shadow 0.2s;
+}
+.LiveMatchCard:hover {
+  box-shadow: 0 8px 32px 0 rgba(42, 67, 101, 0.16);
+}
+.lmc-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.lmc-league {
+  border: 1.5px solid #2563eb;
+  color: #2563eb;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 2px 14px;
+  background: #f7fafd;
+}
+.lmc-status-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lmc-time {
+  color: #555;
+  font-size: 1.02rem;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.lmc-status {
+  font-size: 1.02rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 2px 14px;
+  background: #f3f4f6;
+  color: #555;
+}
+.lmc-status.live {
+  background: #ff4d6d;
+  color: #fff;
+}
+.lmc-status.end {
+  background: #e5e7eb;
+  color: #222;
+}
+/* 메인 행: 상대적 위치, 스코어는 중앙에 고정 */
+.lmc-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 60px;
+}
+.lmc-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 180px;
+  flex: 1 1 0;
+}
+.lmc-home {
+  justify-content: flex-start;
+}
+.lmc-away {
+  justify-content: flex-end;
+}
+.lmc-team-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  background: #f7fafd;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.08);
+}
+.lmc-team-name {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lmc-score-block {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #222;
+  background: #f8f8f8;
+  padding: 0 18px;
+  z-index: 2;
+}
+.lmc-score-sep {
+  font-size: 2rem;
+  color: #bbb;
+  font-weight: 400;
+}
+.lmc-info-row {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+  margin-left: 4px;
+}
+.lmc-info {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.lmc-possession { color: #2563eb; }
+.lmc-shots { color: #22c55e; }
+.lmc-yellow { color: #eab308; }
+.modal-teams-logos {
+  gap: 32px;
+  margin-bottom: 0;
+}
+.modal-team-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90px;
+  gap: 2px;
+}
+.modal-team-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 2px;
+  background: #f7fafd;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.08);
+}
+.modal-team-ko {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 1px;
+  text-align: center;
+}
+.modal-team-en {
+  font-size: 0.97rem;
+  color: #6b7280;
+  font-weight: 400;
+  text-align: center;
+}
+.LiveMatchCard:hover {
+  box-shadow: 0 8px 32px 0 rgba(42, 67, 101, 0.22);
+  transform: translateY(-2px) scale(1.02);
+  background: #f0f6ff;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+}
+
+.MatchModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30,40,60,0.32);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.MatchModal {
+  background: linear-gradient(120deg, #f7fafd 60%, #e6eaff 100%);
+  border-radius: 20px;
+  box-shadow: 0 12px 48px 0 rgba(42, 67, 101, 0.28);
+  padding: 38px 44px 32px 44px;
+  min-width: 340px;
+  max-width: 96vw;
+  max-height: 92vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  border: 1.5px solid #e0e7ef;
+  animation: modalPop 0.22s cubic-bezier(.6,1.5,.5,1) 1;
+}
+@keyframes modalPop {
+  0% { transform: scale(0.92) translateY(30px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.close-modal-btn {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: none;
+  border: none;
+  font-size: 2.1rem;
+  color: #b0b6c6;
+  cursor: pointer;
+  transition: color 0.15s;
+  z-index: 2;
+}
+.close-modal-btn:hover {
+  color: #6a8dff;
+}
+.modal-teams {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.modal-score {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #6a8dff;
+  letter-spacing: 1px;
+  margin: 0 8px;
+}
+.modal-team.home {
+  color: #1a2980;
+}
+.modal-team.away {
+  color: #a259ff;
+}
+.MatchModal h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #4b5563;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+.modal-info {
+  margin-top: 8px;
+  font-size: 1.08rem;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border-top: 1px solid #e0e7ef;
+  padding-top: 12px;
+}
+.modal-info div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.04rem;
+}
+.modal-info b {
+  color: #6a8dff;
+  font-weight: 600;
+}
+.show-more-btn {
+  margin: 12px auto 0 auto;
+  display: block;
+  background: linear-gradient(90deg, #6a8dff 0%, #a259ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 28px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.10);
+  transition: background 0.2s;
+}
+.show-more-btn:hover {
+  background: linear-gradient(90deg, #a259ff 0%, #6a8dff 100%);
+}
+/* 실시간 경기 리스트 스타일 */
+.LiveMatchList {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.LiveMatchCard {
+  background: #f8f8f8;
+  border-radius: 12px;
+  box-shadow: 0 6px 24px 0 rgba(42, 67, 101, 0.18), 0 1.5px 4px 0 rgba(42, 67, 101, 0.10);
+  padding: 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.league {
+  font-weight: 600;
+  color: #6a8dff;
+}
+.status {
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 8px;
+}
+.status.live {
+  background: #e0f2fe;
+  color: #2196f3;
+}
+.status.end {
+  background: #f3f4f6;
+  color: #888;
+}
+.teams {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.team.home {
+  color: #222;
+}
+.team.away {
+  color: #555;
+}
+.score {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a2980;
+}
+.match-info {
+  display: flex;
+  gap: 16px;
+  font-size: 0.95rem;
+  color: #666;
+}
+.no-matches {
+  color: #aaa;
+  text-align: center;
+  padding: 32px 0;
+}

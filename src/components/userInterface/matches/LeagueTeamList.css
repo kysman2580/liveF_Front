@@ -1,0 +1,57 @@
+.team-name-ko {
+  display: block;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 2px;
+}
+.team-name-en {
+  display: block;
+  font-size: 0.98rem;
+  color: #6b7280;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+.team-logo {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 8px auto;
+  background: #f7fafd;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.08);
+}
+/* 리그별 팀 카드 리스트 스타일 */
+.LeagueTeamList {
+  margin: 32px 0 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: flex-start;
+}
+
+.TeamCard {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.10);
+  padding: 16px 24px;
+  min-width: 120px;
+  text-align: center;
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: #1a2980;
+  transition: transform 0.12s, box-shadow 0.12s;
+  cursor: pointer;
+}
+.TeamCard:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 8px 24px 0 rgba(42, 67, 101, 0.18);
+  background: #f7fafd;
+}
+.no-teams {
+  color: #aaa;
+  padding: 32px 0;
+  width: 100%;
+  text-align: center;
+}
