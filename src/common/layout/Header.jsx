@@ -16,6 +16,15 @@ const Header = () => {
   //   auth.isAuthenticated ? logout() : navigate("/sign-up");
   return (
     <>
+
+
+      <div>header</div>
+
+
+
+
+
+
       {/* <header className="sticky top-0 z-50 bg-gradient-to-r from-[#e65c00]/90 to-[#ff9a3c]/90 backdrop-blur-sm shadow-lg"> 
         <div className="max-w-6xl mx-auto flex items-center justify-between h-20 px-6">
           

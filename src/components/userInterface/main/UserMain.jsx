@@ -1,7 +1,11 @@
+import LiveMatch from "../matches/LiveMatch";
+
+
 const UserMain = () => {
   return (
     <>
-      <div>main..</div>
+
+      <LiveMatch />
     </>
   );
 };
