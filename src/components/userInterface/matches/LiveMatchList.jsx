@@ -1,74 +1,13 @@
 
 import React, { useState, useCallback } from 'react';
-import { allMatches, teamKoreanNames, getTeamLogo, teams, chatMessages } from '../../../utils/mockData.js';
+import { allMatches, teamKoreanNames, getTeamLogo, teams } from '../../../utils/mockData.js';
 import './LiveMatchList.css';
+import LiveChatBox from './LiveChatBox.jsx';
 
 // 간단한 로그인 상태 관리 (실제 서비스에서는 context/provider 사용)
 const useAuth = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    // 실제로는 로그인 로직 필요
     return { isLoggedIn, setIsLoggedIn };
-};
-
-// 라이브 채팅 UI 컴포넌트 (심플/기본 스타일)
-const LiveChatBox = ({ match, isLoggedIn, onLoginClick }) => {
-    const [input, setInput] = useState('');
-    const [messages, setMessages] = useState(chatMessages);
-
-    const handleInputChange = (e) => setInput(e.target.value);
-    const handleSend = () => {
-        if (!isLoggedIn) return;
-        if (input.trim() === '') return;
-        setMessages([
-            ...messages,
-            {
-                id: messages.length + 1,
-                user: '나',
-                message: input,
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                type: 'message',
-            },
-        ]);
-        setInput('');
-    };
-
-    return (
-        <div className="live-chat-box">
-            <div className="chat-header">
-                <span className="chat-title">실시간 채팅</span>
-                <span className="chat-match">{match.homeTeam} vs {match.awayTeam}</span>
-            </div>
-            <div className="chat-messages">
-                {messages.map(msg => (
-                    <div key={msg.id} className={`chat-msg chat-msg-${msg.type}`}>
-                        <span className="chat-user">{msg.user}</span>
-                        <span className="chat-text">{msg.message}</span>
-                        <span className="chat-time">{msg.timestamp}</span>
-                    </div>
-                ))}
-            </div>
-            <div className="chat-input-row chat-input-row-modern">
-                {isLoggedIn ? (
-                    <>
-                        <input
-                            className="chat-input"
-                            type="text"
-                            placeholder="메시지를 입력하세요..."
-                            value={input}
-                            onChange={handleInputChange}
-                            onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
-                            autoComplete="off"
-                        />
-                        <button className="chat-send-btn" onClick={handleSend} disabled={!input.trim()}>
-                            <span role="img" aria-label="send">📨</span>
-                        </button>
-                    </>
-                ) : (
-                    <button className="chat-login-btn chat-login-modern-btn" onClick={onLoginClick}>로그인</button>
-                )}
-            </div>
-        </div>
-    );
 };
 
 const LiveMatchList = () => {
@@ -80,7 +19,7 @@ const LiveMatchList = () => {
     // 지금은 mockData 사용
     // 한 번에 보여줄 경기 수
 
-    const PAGE_SIZE = 3;
+    const PAGE_SIZE = 6;
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const [modalMatch, setModalMatch] = useState(null);
 
@@ -116,55 +55,73 @@ const LiveMatchList = () => {
                     <div className="no-matches">경기 정보가 없습니다.</div>
                 ) : (
                     <>
-                        {visibleMatches.map(match => (
+                        {visibleMatches.slice(0, 6).map(match => (
                             <div
                                 className="LiveMatchCard"
                                 key={match.id}
                                 tabIndex={0}
                                 onClick={() => handleCardClick(match)}
                                 onKeyDown={e => { if (e.key === 'Enter') handleCardClick(match); }}
-                                style={{ cursor: 'pointer' }}
+                                style={{ cursor: 'pointer', position: 'relative' }}
                             >
-                                <div className="lmc-top-row">
-                                    <span className="lmc-league">{match.league}</span>
-                                    <div className="lmc-status-block">
-                                        <span className="lmc-time"><i className="fa-regular fa-clock"></i> {match.time || '--'}</span>
-                                        <span className={`lmc-status ${match.isLive ? 'live' : 'end'}`}>{match.isLive ? 'LIVE' : (match.status === 'FT' ? '종료' : match.status)}</span>
+                                <div className="card-gradient" />
+                                <div className="card-content">
+                                    <div className="lmc-top-row">
+                                        <span className="lmc-badge">
+                                            <span className="lmc-badge-dot"></span>
+                                            LIVE
+                                        </span>
+                                        <div className="lmc-time">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-play w-4 h-4 text-red-500" aria-hidden="true"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"></path></svg>
+                                            <span className="font-medium">{match.time || '--'}분</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="lmc-main-row">
-                                    <div className="lmc-team lmc-home">
-                                        <img src={getTeamLogo(match.homeTeam)} alt={match.homeTeam + ' 로고'} className="lmc-team-logo" />
-                                        <span className="lmc-team-name">{match.homeTeam}</span>
+                                    <div className="lmc-main">
+                                        <div className="lmc-team-row">
+                                            <div className="lmc-team-block">
+                                                <div className="lmc-team-logo">
+                                                    <div className="lmc-team-logo-inner">
+                                                        {getTeamLogo(match.homeTeam) && <img src={getTeamLogo(match.homeTeam)} alt={match.homeTeam + ' 로고'} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }} />}
+                                                    </div>
+                                                </div>
+                                                <div className="lmc-team-info">
+                                                    <div className="lmc-team-name">{teamKoreanNames[match.homeTeam] || match.homeTeam}</div>
+                                                    <div className="lmc-team-type">홈</div>
+                                                </div>
+                                            </div>
+                                            <div className="lmc-score">{match.homeScore !== null ? match.homeScore : '-'}</div>
+                                        </div>
+                                        <div className="lmc-vs-row">
+                                            <div className="lmc-vs-line"></div>
+                                            <span className="lmc-vs">VS</span>
+                                            <div className="lmc-vs-line"></div>
+                                        </div>
+                                        <div className="lmc-team-row">
+                                            <div className="lmc-team-block">
+                                                <div className="lmc-team-logo" >
+                                                    <div className="lmc-team-logo-inner">
+                                                        {getTeamLogo(match.awayTeam) && <img src={getTeamLogo(match.awayTeam)} alt={match.awayTeam + ' 로고'} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }} />}
+                                                    </div>
+                                                </div>
+                                                <div className="lmc-team-info">
+                                                    <div className="lmc-team-name">{teamKoreanNames[match.awayTeam] || match.awayTeam}</div>
+                                                    <div className="lmc-team-type">어웨이</div>
+                                                </div>
+                                            </div>
+                                            <div className="lmc-score">{match.awayScore !== null ? match.awayScore : '-'}</div>
+                                        </div>
                                     </div>
-                                    <div className="lmc-score-block">
-                                        <span className="lmc-score">{match.homeScore !== null ? match.homeScore : '-'}</span>
-                                        <span className="lmc-score-sep">-</span>
-                                        <span className="lmc-score">{match.awayScore !== null ? match.awayScore : '-'}</span>
+                                    <div className="lmc-stadium-row">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin w-4 h-4 text-blue-500" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        <span className="lmc-stadium-name">{match.stadium || '-'}</span>
                                     </div>
-                                    <div className="lmc-team lmc-away">
-                                        <img src={getTeamLogo(match.awayTeam)} alt={match.awayTeam + ' 로고'} className="lmc-team-logo" />
-                                        <span className="lmc-team-name">{match.awayTeam}</span>
-                                    </div>
-                                </div>
-                                <div className="lmc-info-row">
-                                    <span className="lmc-info lmc-possession">
-                                        <span className="lmc-dot lmc-dot-blue"></span>
-                                        점유율 64%
-                                    </span>
-                                    <span className="lmc-info lmc-shots">
-                                        <span className="lmc-dot lmc-dot-green"></span>
-                                        슛 12회
-                                    </span>
-                                    <span className="lmc-info lmc-yellow">
-                                        <span className="lmc-dot lmc-dot-yellow"></span>
-                                        경고 3장
-                                    </span>
                                 </div>
                             </div>
                         ))}
                         {visibleCount < allMatches.length && (
-                            <button className="show-more-btn" onClick={handleShowMore}>경기 더보기</button>
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center' }}>
+                                <button className="show-more-btn" onClick={handleShowMore}>경기 더보기</button>
+                            </div>
                         )}
                         {modalMatch && (
                             <div className="MatchModalOverlay" onClick={handleCloseModal}>
@@ -211,7 +168,6 @@ const LiveMatchList = () => {
                     </>
                 )}
             </div>
-            {/* 채팅 박스를 오른쪽에 고정 */}
             <div className="LiveMatchChatAside" style={{ minWidth: 340, marginLeft: 32 }}>
                 <LiveChatBox match={visibleMatches[0] || allMatches[0]} isLoggedIn={isLoggedIn} onLoginClick={handleLoginClick} />
             </div>

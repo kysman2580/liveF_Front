@@ -8,21 +8,26 @@ import './LiveMatch.css';
 const LiveMatch = () => {
     return (
         <>
-            <div className='LeagueNameWrap'>
-                <div className='TvIconWrap'>
-                    <LiveTvIcon className="LiveTvIcon" fontSize="large" />
+            <div className='main-top'>
+                <div className='LeagueNameWrap'>
+                    <div className='LeagueNameRow'>
+                        <div className='TvIconWrap'>
+                            <LiveTvIcon className="LiveTvIcon" fontSize="large" />
+                        </div>
+                        {/* 오른편에 텍스트 블록 */}
+                        <div className='LeagueNameTextBlock'>
+                            <h2 className='LeagueName'>Premier League</h2>
+                            <div className='explain'>실시간 경기 정보를 확인하세요</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    <h2 className='LeagueName'>각 리그명...</h2>
-                    <h2 className='explain'>실기간 경기 정보를 확인하세요</h2>
+                <div className='CalendarRow'>
+                    <CalendarTodayIcon className='CalendarTodayIcon' />
+                    <span className="TodayMatchTitle">오늘의 경기</span>
                 </div>
             </div>
 
-            <div className='CalendarWrap'>
-                <CalendarTodayIcon className='CalendarTodayIcon' />
-                <h2 className="TodayMatchTitle">오늘의 경기</h2>
-            </div>
             <LiveMatchList />
 
             <div className='LeagueTeam'>
