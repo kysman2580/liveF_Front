@@ -59,7 +59,7 @@ const Header = () => {
             </CNavItem>
             <CNavItem>
               <CNavLink
-                onClick={() => navi("/myPage")}
+                onClick={() => navi("/MyPage")}
                 style={{ cursor: "pointer" }}
               >
                 MyPage
