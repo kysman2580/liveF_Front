@@ -1,22 +1,21 @@
 import LiveMatch from "../matches/LiveMatch";
 import Community from "../community/community";
+import CommunityDetail from "../community/CommunityDetail";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const UserMain = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isLive, setIsLive] = useState(true);
-  const [isCommunityList, setIsCommunityList] = useState(false);
+  const isLive = location.pathname === "/";
+  const isCommunityList = location.pathname === "/community";
+  const isCommunityDetail = location.pathname.startsWith("/community/");
 
   return (
     <>
       <div className="category" style={{ marginBottom: 32 }}>
         <button
           className={`category-btn${isLive ? " active" : ""}`}
-          onClick={() => {
-            setIsLive(true);
-            setIsCommunityList(false);
-          }}
+          onClick={() => navigate("/")}
         >
           <span className="category-icon">
             <svg
@@ -36,11 +35,10 @@ const UserMain = () => {
           <span className="category-label">라이브</span>
         </button>
         <button
-          className={`category-btn${isCommunityList ? " active" : ""}`}
-          onClick={() => {
-            setIsLive(false);
-            setIsCommunityList(true);
-          }}
+          className={`category-btn${
+            isCommunityList || isCommunityDetail ? " active" : ""
+          }`}
+          onClick={() => navigate("/community")}
         >
           <span className="category-icon">
             <svg
@@ -64,6 +62,7 @@ const UserMain = () => {
 
       {isLive && <LiveMatch />}
       {isCommunityList && <Community />}
+      {isCommunityDetail && <CommunityDetail />}
     </>
   );
 };
