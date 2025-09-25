@@ -5,6 +5,8 @@ import UserLayout from "./common/layout/UserLayout";
 import AdminLayout from "./common/layout/AdminLayout";
 import UserMain from "./components/userInterface/main/UserMain";
 import LogIn from "./components/userInterface/member/LogIn";
+import Community from "./components/userInterface/community/community";
+import CommunityDetail from "./components/userInterface/community/CommunityDetail";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -14,8 +16,9 @@ function App() {
       <Routes>
         <Route element={<UserLayout />}>
           <Route path="/" element={<UserMain />} />
+          <Route path="/community" element={<UserMain />} />
+          <Route path="/community/:id" element={<UserMain />} />
         </Route>
-
         <Route path="/admin" element={<AdminLayout />}></Route>
       </Routes>
     </>
