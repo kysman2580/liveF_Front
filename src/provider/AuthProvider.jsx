@@ -1,101 +1,87 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, use } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navi = useNavigate();
   const [auth, setAuth] = useState({
-    user: {
-      memberNo: null,
-      email: null,
-      memberPw: null,
-      memberName: null,
-      accessToken: null,
-      refreshToken: null,
-      isAuthenticated: false, // 기존 : isLoggedIn: true
-    },
+    memberInfo: null,
+    isAuthenticated: false,
   });
 
   useEffect(() => {
-    const memberNo = localStorage.getItem("memberNo");
-    const email = localStorage.getItem("email");
-    const memberName = localStorage.getItem("memberName");
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (memberNo && email && memberName && accessToken && refreshToken) {
+    const loginInfo = JSON.parse(sessionStorage.getItem("loginInfo"));
+    const isAuthenticated = sessionStorage.getItem("isAuthenticated");
+    if (isAuthenticated && loginInfo !== null) {
       setAuth({
-        user: {
-          memberNo,
-          email,
-          memberName,
-          accessToken,
-          refreshToken,
-          isAuthenticated: true,
-        },
+        memberInfo: loginInfo,
+        isAuthenticated: true,
+      });
+    } else {
+      setAuth({
+        memberInfo: loginInfo,
+        isAuthenticated: true,
       });
     }
   }, []);
 
-  const login = (memberNo, email, memberName, accessToken, refreshToken) => {
+  const login = (memberInfo) => {
     setAuth({
-      user: {
-        memberNo,
-        email,
-        memberName,
-        accessToken,
-        refreshToken,
-        isAuthenticated: true,
-      },
+      memberInfo: memberInfo,
+      isAuthenticated: true,
     });
-    localStorage.setItem("memberNo", memberNo);
-    localStorage.setItem("email", email);
-    localStorage.setItem("memberName", memberName);
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
+    if (loginInfo !== null) {
+      sessionStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+    }
+    sessionStorage.setItem("isAuthenticated", true);
   };
 
   const logout = () => {
+    axios
+      .delete(`http://localhost:8080/api/auth/logout`, {
+        withCredentials: true,
+      })
+      .then(() => {
+        setAuth({
+          memberInfo: null,
+          isAuthenticated: false,
+        });
+        alert("로그아웃 되었습니다.");
+      })
+      .catch((err) => {
+        alert(err);
+      });
+    sessionStorage.clear();
     setAuth({
-      user: {
-        email: null,
-        memberName: null,
-        memberPw: null,
-        accessToken: null,
-        refreshToken: null,
-        isAuthenticated: false,
-      },
+      loginInfo: null,
+      isAuthenticated: false,
     });
-    localStorage.removeItem("memberNo");
-    localStorage.removeItem("email");
-    localStorage.removeItem("memberName");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    alert("로그아웃 되었습니다.");
-    window.location.href = "/";
+    sessionStorage.removeItem("loginInfo");
+    sessionStorage.removeItem("isAuthenticated");
+    navi("/");
   };
 
-  const cancel = () => {
-    setAuth({
-      user: {
-        email: null,
-        memberName: null,
-        memberPw: null,
-        accessToken: null,
-        refreshToken: null,
-        isAuthenticated: false,
-      },
-    });
-    localStorage.removeItem("email");
-    localStorage.removeItem("memberNo");
-    localStorage.removeItem("memberName");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    alert("회원 탈퇴가 완료 되었습니다.");
-    window.location.href = "/";
-  };
+  // const cancel = () => {
+  //   axios
+  //     .post(`${apiUrl}/api/delete`, {}, { withCredentials: true })
+  //     .finally(() => {
+  //       setAuth({
+  //         user: {
+  //           memberNo: null,
+  //           email: null,
+  //           memberName: null,
+  //           isAuthenticated: false,
+  //         },
+  //       });
+  //       alert("회원 탈퇴가 완료 되었습니다.");
+  //       window.location.href = "/";
+  //     });
+  // };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, cancel }}>
+    <AuthContext.Provider value={{ auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
