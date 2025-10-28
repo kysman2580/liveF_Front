@@ -10,6 +10,7 @@ const UserMain = () => {
   const isCommunityList = location.pathname === "/community";
   const isCommunityDetail = location.pathname.startsWith("/community/");
 
+
   return (
     <>
       <div className='category' style={{ marginBottom: 32 }}>

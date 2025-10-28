@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from "axios";
 import { teamsByLeague, teams } from '../../../utils/mockData';
 import './LeagueTeamList.css';
 
