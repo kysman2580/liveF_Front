@@ -73,7 +73,7 @@ button.category-btn:hover {
   justify-content: center;
   gap: 18px;
   background: #ffffff;
-  padding: 24px 32px;
+  padding: 24px 30px;
   border-radius: 16px;
   width: fit-content;
 }
@@ -134,8 +134,7 @@ button.category-btn:hover {
     width: fit-content;
     margin-top: 5px;
     border-radius: 16px;
-    background: #f8f8f8;
-    box-shadow: 0 6px 24px 0 rgba(42, 67, 101, 0.18), 0 1.5px 4px 0 rgba(42, 67, 101, 0.10);
+    background: #ffffff;
 }
 
 .CalendarRow{
@@ -153,15 +152,6 @@ button.category-btn:hover {
   letter-spacing: -0.5px;
   position: relative;
 
-}
-.CalendarWrap{
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  margin-top: 5px;
-  border-radius: 16px;
-  background: #f8f8f8;
-  box-shadow: 0 6px 24px 0 rgba(42, 67, 101, 0.18), 0 1.5px 4px 0 rgba(42, 67, 101, 0.10);
 }
 
 
