@@ -12,14 +12,16 @@ import {
   Row,
   SecondaryBtn,
 } from "./LogIn.styles";
-import axios from "axios";
+import axios from "../../../api/AxiosInterceptor";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../provider/AuthProvider";
 
 const LogIn = ({ setOpenLogInModal }) => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const navi = useNavigate();
+  const { login } = useAuth();
 
   console.log(id, password);
 
@@ -40,6 +42,7 @@ const LogIn = ({ setOpenLogInModal }) => {
         setOpenLogInModal(false);
         alert("로그인 되었습니다.");
         navi("/");
+        login(response.data.data);
       })
       .catch((error) => {
         console.error("There was an error!", error);

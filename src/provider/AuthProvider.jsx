@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, use } from "react";
-import axios from "axios";
+import axios from "../api/AxiosInterceptor";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
@@ -12,19 +12,20 @@ export const AuthProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    const loginInfo = JSON.parse(sessionStorage.getItem("loginInfo"));
-    const isAuthenticated = sessionStorage.getItem("isAuthenticated");
-    if (isAuthenticated && loginInfo !== null) {
-      setAuth({
-        memberInfo: loginInfo,
-        isAuthenticated: true,
+    axios
+      .post("/api/auth/refresh", { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        const memberInfo = res.data.data.memberInfo;
+        login(memberInfo);
+      })
+      .catch(() => {
+        // refresh 실패 → 비로그인 상태로
+        setAuth({
+          memberInfo: null,
+          isAuthenticated: false,
+        });
       });
-    } else {
-      setAuth({
-        memberInfo: loginInfo,
-        isAuthenticated: true,
-      });
-    }
   }, []);
 
   const login = (memberInfo) => {
@@ -32,8 +33,8 @@ export const AuthProvider = ({ children }) => {
       memberInfo: memberInfo,
       isAuthenticated: true,
     });
-    if (loginInfo !== null) {
-      sessionStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+    if (memberInfo !== null) {
+      sessionStorage.setItem("memberInfo", JSON.stringify(memberInfo));
     }
     sessionStorage.setItem("isAuthenticated", true);
   };
@@ -55,33 +56,32 @@ export const AuthProvider = ({ children }) => {
       });
     sessionStorage.clear();
     setAuth({
-      loginInfo: null,
+      memberInfo: null,
       isAuthenticated: false,
     });
-    sessionStorage.removeItem("loginInfo");
+    sessionStorage.removeItem("memberInfo");
     sessionStorage.removeItem("isAuthenticated");
     navi("/");
   };
 
-  // const cancel = () => {
-  //   axios
-  //     .post(`${apiUrl}/api/delete`, {}, { withCredentials: true })
-  //     .finally(() => {
-  //       setAuth({
-  //         user: {
-  //           memberNo: null,
-  //           email: null,
-  //           memberName: null,
-  //           isAuthenticated: false,
-  //         },
-  //       });
-  //       alert("회원 탈퇴가 완료 되었습니다.");
-  //       window.location.href = "/";
-  //     });
-  // };
+  const deleteAccount = () => {
+    axios
+      .delete(`http://localhost:8080/api/member/delete`, {
+        withCredentials: true,
+      })
+      .finally(() => {
+        setAuth({
+          memberInfo: null,
+          isAuthenticated: false,
+        });
+        alert("회원 탈퇴가 완료 되었습니다.");
+        navi("/");
+      });
+    sessionStorage.clear();
+  };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
