@@ -1,64 +1,84 @@
-
-import React, { useState, useCallback } from 'react';
-import { allMatches, teamKoreanNames, getTeamLogo, teams } from '../../../utils/mockData.js';
-import './LiveMatchList.css';
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import LiveChatBox from './LiveChatBox.jsx';
+import { useLocation } from 'react-router-dom';
+import './LiveMatchList.css';
 
-// 간단한 로그인 상태 관리 (실제 서비스에서는 context/provider 사용)
-const useAuth = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    return { isLoggedIn, setIsLoggedIn };
-};
+const DEFAULT_LEAGUE_ID = 39; // 기본 리그: Premier League
+const API_URL = URL_CONFIG.API_URL; // 환경 변수로 설정된 API URL
+const PAGE_SIZE = 6;
 
 const LiveMatchList = () => {
-    // 나중에 API로 대체될 부분
-    // const [matches, setMatches] = useState([]);
-    // useEffect(() => {
-    //   fetch('/api/live-matches').then(...)
-    // }, []);
-    // 지금은 mockData 사용
-    // 한 번에 보여줄 경기 수
-
-    const PAGE_SIZE = 6;
+    const [matches, setMatches] = useState([]);
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const [modalMatch, setModalMatch] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const location = useLocation();
+
+    // 로그인 상태 관리
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loginModal, setLoginModal] = useState(false);
+    const [currentUser, setCurrentUser] = useState('익명'); // 사용자명
+
+    const handleLoginClick = () => setLoginModal(true);
+
+    const handleDoLogin = () => {
+        setIsLoggedIn(true);
+        // 임시 사용자명 생성 (실제로는 로그인 API에서 받아와야 함)
+        setCurrentUser('사용자' + Math.floor(Math.random() * 1000));
+        setLoginModal(false);
+    };
+
+    const handleCloseLoginModal = () => setLoginModal(false);
+
+    // 현재 리그 ID 추출
+    const queryParams = new URLSearchParams(location.search);
+    const currentLeagueId = parseInt(queryParams.get('leagueId') || DEFAULT_LEAGUE_ID);
+
+    useEffect(() => {
+        setLoading(true);
+
+        axios.get(`${API_URL}/api/v1/feed/fixtures?leagueId=${currentLeagueId}`)
+            .then(res => {
+                setMatches(Array.isArray(res.data) ? res.data : []);
+                setError(null);
+            })
+            .catch(error => {
+                console.error("Error fetching fixtures:", error);
+                setMatches([]);
+                setError('경기 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [location.search, currentLeagueId]);
 
     const handleShowMore = useCallback(() => {
         setVisibleCount((prev) => prev + PAGE_SIZE);
     }, []);
 
-    const visibleMatches = allMatches.slice(0, visibleCount);
+    const visibleMatches = Array.isArray(matches) ? matches.slice(0, visibleCount) : [];
 
-    const handleCardClick = (match) => {
-        setModalMatch(match);
-    };
-
-    const handleCloseModal = () => {
-        setModalMatch(null);
-    };
-
-    const { isLoggedIn, setIsLoggedIn } = useAuth();
-    const [loginModal, setLoginModal] = useState(false);
-    const handleLoginClick = () => {
-        setLoginModal(true);
-    };
-    const handleDoLogin = () => {
-        setIsLoggedIn(true);
-        setLoginModal(false);
-    };
-    const handleCloseLoginModal = () => setLoginModal(false);
+    const handleCardClick = (match) => setModalMatch(match);
+    const handleCloseModal = () => setModalMatch(null);
 
     return (
         <div className="LiveMatchListWrap" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+            {/* 경기 목록 */}
             <div className="LiveMatchList" style={{ flex: 1 }}>
-                {allMatches.length === 0 ? (
+                {loading ? (
+                    <div className="no-matches">경기 정보를 불러오는 중...</div>
+                ) : error ? (
+                    <div className="no-matches" style={{ color: 'red' }}>{error}</div>
+                ) : matches.length === 0 ? (
                     <div className="no-matches">경기 정보가 없습니다.</div>
                 ) : (
                     <>
-                        {visibleMatches.slice(0, 6).map(match => (
+                        {visibleMatches.map(match => (
                             <div
                                 className="LiveMatchCard"
-                                key={match.id}
+                                key={match.fixtureId || Math.random()}
                                 tabIndex={0}
                                 onClick={() => handleCardClick(match)}
                                 onKeyDown={e => { if (e.key === 'Enter') handleCardClick(match); }}
@@ -69,27 +89,30 @@ const LiveMatchList = () => {
                                     <div className="lmc-top-row">
                                         <span className="lmc-badge">
                                             <span className="lmc-badge-dot"></span>
-                                            LIVE
+                                            {match.status || 'NS'}
                                         </span>
                                         <div className="lmc-time">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-play w-4 h-4 text-red-500" aria-hidden="true"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"></path></svg>
-                                            <span className="font-medium">{match.time || '--'}분</span>
+                                            <span className="font-medium">{match.time || '--'}</span>
                                         </div>
                                     </div>
                                     <div className="lmc-main">
                                         <div className="lmc-team-row">
                                             <div className="lmc-team-block">
-                                                <div className="lmc-team-logo">
-                                                    <div className="lmc-team-logo-inner">
-                                                        {getTeamLogo(match.homeTeam) && <img src={getTeamLogo(match.homeTeam)} alt={match.homeTeam + ' 로고'} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }} />}
-                                                    </div>
+                                                <div className="lmc-team-logo-inner">
+                                                    {match.homeTeamLogoUrl && (
+                                                        <img
+                                                            src={match.homeTeamLogoUrl}
+                                                            alt={`${match.homeTeamName || 'Unknown'} 로고`}
+                                                            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }}
+                                                        />
+                                                    )}
                                                 </div>
                                                 <div className="lmc-team-info">
-                                                    <div className="lmc-team-name">{teamKoreanNames[match.homeTeam] || match.homeTeam}</div>
+                                                    <div className="lmc-team-name">{match.homeTeamName || 'Unknown'}</div>
                                                     <div className="lmc-team-type">홈</div>
                                                 </div>
                                             </div>
-                                            <div className="lmc-score">{match.homeScore !== null ? match.homeScore : '-'}</div>
+                                            <div className="lmc-score">{match.score ? match.score.split(' - ')[0] || '-' : '-'}</div>
                                         </div>
                                         <div className="lmc-vs-row">
                                             <div className="lmc-vs-line"></div>
@@ -98,63 +121,73 @@ const LiveMatchList = () => {
                                         </div>
                                         <div className="lmc-team-row">
                                             <div className="lmc-team-block">
-                                                <div className="lmc-team-logo" >
-                                                    <div className="lmc-team-logo-inner">
-                                                        {getTeamLogo(match.awayTeam) && <img src={getTeamLogo(match.awayTeam)} alt={match.awayTeam + ' 로고'} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }} />}
-                                                    </div>
+                                                <div className="lmc-team-logo-inner">
+                                                    {match.awayTeamLogoUrl && (
+                                                        <img
+                                                            src={match.awayTeamLogoUrl}
+                                                            alt={`${match.awayTeamName || 'Unknown'} 로고`}
+                                                            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }}
+                                                        />
+                                                    )}
                                                 </div>
                                                 <div className="lmc-team-info">
-                                                    <div className="lmc-team-name">{teamKoreanNames[match.awayTeam] || match.awayTeam}</div>
+                                                    <div className="lmc-team-name">{match.awayTeamName || 'Unknown'}</div>
                                                     <div className="lmc-team-type">어웨이</div>
                                                 </div>
                                             </div>
-                                            <div className="lmc-score">{match.awayScore !== null ? match.awayScore : '-'}</div>
+                                            <div className="lmc-score">{match.score ? match.score.split(' - ')[1] || '-' : '-'}</div>
                                         </div>
                                     </div>
                                     <div className="lmc-stadium-row">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-map-pin w-4 h-4 text-blue-500" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                        <span className="lmc-stadium-name">{match.stadium || '-'}</span>
+                                        <span className="lmc-stadium-name">{match.venue || '-'}</span>
                                     </div>
                                 </div>
                             </div>
                         ))}
-                        {visibleCount < allMatches.length && (
+
+                        {visibleCount < matches.length && (
                             <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center' }}>
                                 <button className="show-more-btn" onClick={handleShowMore}>경기 더보기</button>
                             </div>
                         )}
+
+                        {/* 경기 상세 모달 */}
                         {modalMatch && (
                             <div className="MatchModalOverlay" onClick={handleCloseModal}>
                                 <div className="MatchModal" onClick={e => e.stopPropagation()}>
                                     <button className="close-modal-btn" onClick={handleCloseModal}>&times;</button>
-                                    <h2>{modalMatch.league}</h2>
+                                    <h2>{modalMatch.leagueName || 'Unknown League'}</h2>
                                     <div className="modal-teams modal-teams-logos">
                                         <div className="modal-team-block">
-                                            {getTeamLogo(modalMatch.homeTeam) && (
-                                                <img src={getTeamLogo(modalMatch.homeTeam)} alt={modalMatch.homeTeam + ' 로고'} className="modal-team-logo" />
+                                            {modalMatch.homeTeamLogoUrl && (
+                                                <img
+                                                    src={modalMatch.homeTeamLogoUrl}
+                                                    alt={`${modalMatch.homeTeamName || 'Unknown'} 로고`}
+                                                    className="modal-team-logo"
+                                                />
                                             )}
-                                            <span className="modal-team-ko">{teamKoreanNames[modalMatch.homeTeam] || modalMatch.homeTeam}</span>
-                                            <span className="modal-team-en">{modalMatch.homeTeam}</span>
+                                            <span className="modal-team-ko">{modalMatch.homeTeamName || 'Unknown'}</span>
                                         </div>
-                                        <span className="modal-score">{modalMatch.homeScore} : {modalMatch.awayScore}</span>
+                                        <span className="modal-score">{modalMatch.score || '0 - 0'}</span>
                                         <div className="modal-team-block">
-                                            {getTeamLogo(modalMatch.awayTeam) && (
-                                                <img src={getTeamLogo(modalMatch.awayTeam)} alt={modalMatch.awayTeam + ' 로고'} className="modal-team-logo" />
+                                            {modalMatch.awayTeamLogoUrl && (
+                                                <img
+                                                    src={modalMatch.awayTeamLogoUrl}
+                                                    alt={`${modalMatch.awayTeamName || 'Unknown'} 로고`}
+                                                    className="modal-team-logo"
+                                                />
                                             )}
-                                            <span className="modal-team-ko">{teamKoreanNames[modalMatch.awayTeam] || modalMatch.awayTeam}</span>
-                                            <span className="modal-team-en">{modalMatch.awayTeam}</span>
+                                            <span className="modal-team-ko">{modalMatch.awayTeamName || 'Unknown'}</span>
                                         </div>
                                     </div>
                                     <div className="modal-info">
-                                        <div><span>경기 상태</span> <b>{modalMatch.status}</b></div>
-                                        <div><span>진행 시간</span> <b>{modalMatch.time}</b></div>
-                                        <div><span>경기장</span> <b>{modalMatch.stadium}</b></div>
-                                        <div><span>일자</span> <b>{modalMatch.date}</b></div>
-                                        <div><span>시작 시간</span> <b>{modalMatch.startTime}</b></div>
+                                        <div><span>경기 상태</span> <b>{modalMatch.status || 'NS'}</b></div>
+                                        <div><span>경기장</span> <b>{modalMatch.venue || '-'}</b></div>
                                     </div>
                                 </div>
                             </div>
                         )}
+
                         {/* 로그인 모달 */}
                         {loginModal && (
                             <div className="login-modal-overlay" onClick={handleCloseLoginModal}>
@@ -168,8 +201,15 @@ const LiveMatchList = () => {
                     </>
                 )}
             </div>
+
+            {/* 채팅창 - 리그ID 전달 ⭐ 핵심 변경 부분! */}
             <div className="LiveMatchChatAside" style={{ minWidth: 340, marginLeft: 32 }}>
-                <LiveChatBox match={visibleMatches[0] || allMatches[0]} isLoggedIn={isLoggedIn} onLoginClick={handleLoginClick} />
+                <LiveChatBox
+                    leagueId={currentLeagueId}      // ← match 대신 leagueId 전달!
+                    isLoggedIn={isLoggedIn}
+                    onLoginClick={handleLoginClick}
+                    currentUser={currentUser}       // ← 사용자명 전달
+                />
             </div>
         </div>
     );

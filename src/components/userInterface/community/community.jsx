@@ -21,6 +21,7 @@ const filters = [
   { key: "popular", label: "인기순" },
   { key: "views", label: "조회순" },
 ];
+
 const PAGE_SIZE = 6;
 
 const Community = () => {
