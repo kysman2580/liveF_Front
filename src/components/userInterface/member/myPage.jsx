@@ -15,37 +15,19 @@ import {
   SecondaryBtn,
   DangerBtn,
 } from "./MyPage.styles";
+import { useAuth } from "../../../provider/AuthProvider";
+import axios from "../../../api/AxiosInterceptor";
 
-const MyPage = ({
-  user,
-  teams = [],
-  onChangePassword,
-  onSelectTeam,
-  onDeleteAccount,
-  message = "",
-  error = "",
-  busy = false,
-}) => {
+const MyPage = () => {
   const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
   const [confirmPw, setConfirmPw] = useState("");
+  const { auth, deleteAccount } = useAuth();
 
-  function submitChangePassword(e) {
-    e.preventDefault();
-    if (!onChangePassword) return;
-    if (!currentPw || !newPw) return;
-    if (newPw !== confirmPw) return;
-    onChangePassword({ currentPassword: currentPw, newPassword: newPw });
+  if (!auth.memberInfo) {
+    return <div style={{ padding: 16 }}>로딩중...</div>;
   }
-
-  const pwStrength = useMemo(() => {
-    let s = 0;
-    if (newPw.length >= 8) s++;
-    if (/[A-Z]/.test(newPw)) s++;
-    if (/[0-9]/.test(newPw)) s++;
-    if (/[^A-Za-z0-9]/.test(newPw)) s++;
-    return s;
-  }, [newPw]);
+  console.log(auth);
 
   return (
     <Page>
@@ -63,17 +45,17 @@ const MyPage = ({
           <Grid2>
             <div>
               <Label>아이디</Label>
-              <div>{user ? user.username : "-"}</div>
+
+              <div>{auth ? auth.memberInfo.memberId : "-"}</div>
             </div>
             <div>
               <Label>내 번호(ID)</Label>
-              <div>{user ? user.id : "-"}</div>
+              <div>{auth ? auth.memberInfo.memberNo : "-"}</div>
             </div>
           </Grid2>
         </Card>
-
         {/* 비밀번호 변경 */}
-        <Card>
+        {/* <Card>
           <CardTop>
             <CardTitle>비밀번호 변경</CardTitle>
           </CardTop>
@@ -139,9 +121,8 @@ const MyPage = ({
               </SecondaryBtn>
             </div>
           </form>
-        </Card>
-
-        {/* 내 축구팀 */}
+        </Card> */}
+        {/* 내 축구팀
         <Card>
           <CardTop>
             <CardTitle>내 축구팀</CardTitle>
@@ -169,40 +150,24 @@ const MyPage = ({
               등록된 팀이 없습니다.
             </p>
           )}
-        </Card>
-
+        </Card> */}
         {/* 회원 탈퇴 */}
         <Card>
           <CardTop>
-            <CardTitle style={{ color: "#dc2626" }}>회원 탈퇴</CardTitle>
+            <CardTitle
+              style={{ color: "#dc2626" }}
+              onClick={() => alert("회원을 탈퇴하시겠습니까?")}
+            >
+              회원 탈퇴
+            </CardTitle>
           </CardTop>
           <p
             style={{ fontSize: "0.875rem", color: "#4b5563", marginBottom: 12 }}
           >
             탈퇴 시 데이터가 삭제될 수 있습니다.
           </p>
-          <DangerBtn
-            onClick={() => onDeleteAccount && onDeleteAccount()}
-            disabled={busy}
-          >
-            회원 탈퇴
-          </DangerBtn>
+          <DangerBtn onClick={deleteAccount}>회원 탈퇴</DangerBtn>
         </Card>
-
-        {/* 알림 메시지 */}
-        {(message || error) && (
-          <div
-            style={{
-              borderRadius: 16,
-              padding: 16,
-              border: "1px solid",
-              color: error ? "#b91c1c" : "#047857",
-              background: error ? "#fef2f2" : "#ecfdf5",
-            }}
-          >
-            {error || message}
-          </div>
-        )}
       </Stack>
     </Page>
   );

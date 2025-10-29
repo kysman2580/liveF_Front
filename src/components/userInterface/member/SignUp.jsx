@@ -15,7 +15,7 @@ import {
 } from "./SignUp.styles";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { use, useState } from "react";
-import axios from "axios";
+import axios from "../../../api/AxiosInterceptor";
 import { useNavigate } from "react-router-dom";
 
 const SignUp = ({ setOpenSignUpModal }) => {
