@@ -101,7 +101,6 @@ const LogIn = ({ setOpenLogInModal }) => {
             </Actions>
 
             <Row style={{ justifyContent: "center", gap: 12, marginTop: 12 }}>
-              <HelperLink href="#">Google로 계속하기</HelperLink>
               <span aria-hidden>·</span>
               <HelperLink href="#">Kakao로 계속하기</HelperLink>
             </Row>
