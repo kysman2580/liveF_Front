@@ -30,7 +30,7 @@ const SignUp = ({ setOpenSignUpModal }) => {
   const signUpHandler = () => {
     axios
       .post(
-        "http://localhost:8080/api/member/sign-up",
+        "/api/member/sign-up",
         {
           memberName: name,
           memberNickname: nickname,

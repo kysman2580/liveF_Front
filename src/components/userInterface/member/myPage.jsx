@@ -12,7 +12,6 @@ import {
   Label,
   Input,
   PrimaryBtn,
-  SecondaryBtn,
   DangerBtn,
 } from "./MyPage.styles";
 import { useAuth } from "../../../provider/AuthProvider";
@@ -29,7 +28,10 @@ const MyPage = () => {
       .get("/api/member/myInfo", { withCredentials: true })
       .then((response) => {
         console.log(response.data);
-        setMemberInfo(response.data.data.member);
+        const member = response.data.data.member;
+
+        const { memberPw, ...filteredMember } = member;
+        setMemberInfo(filteredMember);
       })
       .catch((error) => {
         console.error("There was an error!", error);
