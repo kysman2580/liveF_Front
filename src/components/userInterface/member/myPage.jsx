@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Page,
   Header,
@@ -12,22 +12,59 @@ import {
   Label,
   Input,
   PrimaryBtn,
-  SecondaryBtn,
   DangerBtn,
 } from "./MyPage.styles";
 import { useAuth } from "../../../provider/AuthProvider";
 import axios from "../../../api/AxiosInterceptor";
 
 const MyPage = () => {
-  const [currentPw, setCurrentPw] = useState("");
-  const [newPw, setNewPw] = useState("");
-  const [confirmPw, setConfirmPw] = useState("");
   const { auth, deleteAccount } = useAuth();
+  const [memberInfo, setMemberInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
-  if (!auth.memberInfo) {
-    return <div style={{ padding: 16 }}>로딩중...</div>;
-  }
-  console.log(auth);
+  useEffect(() => {
+    axios
+      .get("/api/member/myInfo", { withCredentials: true })
+      .then((response) => {
+        console.log(response.data);
+        const member = response.data.data.member;
+
+        const { memberPw, ...filteredMember } = member;
+        setMemberInfo(filteredMember);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setMemberInfo((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdate = () => {
+    axios
+      .put("/api/member/update", memberInfo, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        console.log("회원정보 수정 성공:", res);
+        alert("회원 정보가 수정되었습니다!");
+        setIsEditing(false);
+      })
+      .catch((error) => {
+        console.error("회원정보 수정 실패:", error);
+        alert("회원 정보 수정 중 오류가 발생했습니다.");
+      });
+  };
+
+  if (loading) return <div style={{ padding: 16 }}>로딩중...</div>;
+  if (!memberInfo)
+    return <div style={{ padding: 16 }}>회원 정보를 불러오지 못했습니다.</div>;
+
+  console.log("memberInfo:", memberInfo);
 
   return (
     <Page>
@@ -45,121 +82,82 @@ const MyPage = () => {
           <Grid2>
             <div>
               <Label>아이디</Label>
-
-              <div>{auth ? auth.memberInfo.memberId : "-"}</div>
+              <Input
+                name="memberId"
+                value={memberInfo.memberId}
+                disabled={!isEditing}
+                onChange={handleChange}
+              />
             </div>
             <div>
-              <Label>내 번호(ID)</Label>
-              <div>{auth ? auth.memberInfo.memberNo : "-"}</div>
+              <Label>회원 번호</Label>
+              <Input name="memberNo" value={memberInfo.memberNo} disabled />
+            </div>
+            <div>
+              <Label>이름</Label>
+              <Input
+                name="memberName"
+                value={memberInfo.memberName}
+                onChange={handleChange}
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <Label>닉네임</Label>
+              <Input
+                name="memberNickname"
+                value={memberInfo.memberNickname}
+                onChange={handleChange}
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <Label>전화번호</Label>
+              <Input
+                name="memberPhone"
+                value={memberInfo.memberPhone}
+                onChange={handleChange}
+                disabled={!isEditing}
+              />
+            </div>
+            <div>
+              <Label>가입일</Label>
+              <Input
+                name="enrollDate"
+                value={new Date(memberInfo.enrollDate).toLocaleString()}
+                disabled
+              />
+            </div>
+            <div>
+              <Label>활동 상태</Label>
+              <Input
+                name="isActive"
+                value={memberInfo.isActive === "Y" ? "활성" : "비활성"}
+                disabled
+              />
+            </div>
+            <div>
+              <Label>권한</Label>
+              <Input name="memberRole" value={memberInfo.memberRole} disabled />
             </div>
           </Grid2>
-        </Card>
-        {/* 비밀번호 변경 */}
-        {/* <Card>
-          <CardTop>
-            <CardTitle>비밀번호 변경</CardTitle>
-          </CardTop>
-          <form onSubmit={submitChangePassword}>
-            <div>
-              <Label>현재 비밀번호</Label>
-              <Input
-                type="password"
-                value={currentPw}
-                onChange={(e) => setCurrentPw(e.target.value)}
-                disabled={busy}
-              />
-            </div>
-            <div>
-              <Label>새 비밀번호</Label>
-              <Input
-                type="password"
-                value={newPw}
-                onChange={(e) => setNewPw(e.target.value)}
-                disabled={busy}
-              />
-              <div
-                style={{
-                  marginTop: 6,
-                  height: 6,
-                  background: "#e5e7eb",
-                  borderRadius: 6,
-                }}
-              >
-                <div
-                  style={{
-                    height: 6,
-                    width: (pwStrength / 4) * 100 + "%",
-                    background: "#4f46e5",
-                    borderRadius: 6,
-                    transition: "width 0.2s",
-                  }}
-                />
-              </div>
-            </div>
-            <div>
-              <Label>새 비밀번호 확인</Label>
-              <Input
-                type="password"
-                value={confirmPw}
-                onChange={(e) => setConfirmPw(e.target.value)}
-                disabled={busy}
-              />
-            </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <PrimaryBtn type="submit" disabled={busy}>
-                변경
+
+          {/* ✅ 수정 / 완료 버튼 */}
+          <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+            {isEditing ? (
+              <PrimaryBtn onClick={handleUpdate}>수정완료</PrimaryBtn>
+            ) : (
+              <PrimaryBtn onClick={() => setIsEditing(true)}>
+                수정하기
               </PrimaryBtn>
-              <SecondaryBtn
-                type="button"
-                onClick={() => {
-                  setCurrentPw("");
-                  setNewPw("");
-                  setConfirmPw("");
-                }}
-              >
-                초기화
-              </SecondaryBtn>
-            </div>
-          </form>
-        </Card> */}
-        {/* 내 축구팀
-        <Card>
-          <CardTop>
-            <CardTitle>내 축구팀</CardTitle>
-          </CardTop>
-          {teams.length ? (
-            <ul style={{ display: "grid", gap: 8 }}>
-              {teams.map((t) => (
-                <li
-                  key={t.id}
-                  style={{ display: "flex", gap: 8, alignItems: "center" }}
-                >
-                  <input
-                    type="radio"
-                    name="myteam"
-                    checked={user && user.selectedTeamId === t.id}
-                    onChange={() => onSelectTeam && onSelectTeam(t.id)}
-                    disabled={busy}
-                  />
-                  <span>{t.name}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>
-              등록된 팀이 없습니다.
-            </p>
-          )}
-        </Card> */}
+            )}
+          </div>
+        </Card>
+
         {/* 회원 탈퇴 */}
         <Card>
           <CardTop>
-            <CardTitle
-              style={{ color: "#dc2626" }}
-              onClick={() => alert("회원을 탈퇴하시겠습니까?")}
-            >
-              회원 탈퇴
-            </CardTitle>
+            <CardTitle style={{ color: "#dc2626" }}>회원 탈퇴</CardTitle>
           </CardTop>
           <p
             style={{ fontSize: "0.875rem", color: "#4b5563", marginBottom: 12 }}
