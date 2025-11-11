@@ -281,4 +281,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
             {openLogInModal && <LogIn setOpenLogInModal={setOpenLogInModal} />}
         </>
     );
-}
+
+};
+
+export default LiveChatBox;
