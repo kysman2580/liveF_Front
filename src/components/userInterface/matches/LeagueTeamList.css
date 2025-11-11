@@ -29,8 +29,6 @@
   flex-wrap: wrap;
   gap: 18px;
   justify-content: flex-start;
-  max-width: 1000px;
-  width: 1000px;
 }
 
 .TeamCard {
@@ -38,7 +36,7 @@
   border-radius: 10px;
   box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.10);
   padding: 16px 24px;
-  min-width: 270px;
+  min-width: 120px;
   text-align: center;
   font-size: 1.08rem;
   font-weight: 500;
