@@ -151,7 +151,7 @@ const LiveMatchList = () => {
                             </div>
                         )}
 
-                        {/* 경기 상세 모달 */}
+                        {/* 경기 상세 모d달 */}
                         {modalMatch && (
                             <div className="MatchModalOverlay" onClick={handleCloseModal}>
                                 <div className="MatchModal" onClick={e => e.stopPropagation()}>
