@@ -90,7 +90,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
 
             // SockJS 옵션 단순화
             const socket = new SockJS(wsUrl);
-            
+
             socket.onopen = () => console.log('✅ SockJS 소켓 열림');
             socket.onerror = (e) => {
                 console.error('❌ SockJS 에러:', e);
@@ -111,7 +111,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
             // 💡 CONNECT 헤더 설정 (CSRF 헤더 없음)
             const connectHeaders = {
                 'X-Username': currentUser,
-                'heart-beat': '10000,10000' 
+                'heart-beat': '10000,10000'
             };
 
             console.log('📤 CONNECT 헤더 (CSRF 없음):', connectHeaders);
@@ -131,7 +131,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
                         try {
                             const data = JSON.parse(msg.body);
                             console.log('📩 메시지 수신:', data);
-                            
+
                             setMessages(prev => {
                                 const newMsg = {
                                     id: Date.now() + Math.random(),
@@ -161,11 +161,11 @@ const LiveChatBox = ({ leagueId = 39 }) => {
                 (error) => {
                     console.error('❌ STOMP 연결 실패:', error);
                     console.error('Error Frame:', error);
-                    
+
                     const errorMsg = error?.headers?.message || error?.body || 'Unknown error';
                     setConnected(false);
                     setConnectionError(`연결 실패: ${errorMsg}`);
-                    
+
                     // 5초 후 재연결
                     if (isLoggedIn) {
                         reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
@@ -281,6 +281,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
             {openLogInModal && <LogIn setOpenLogInModal={setOpenLogInModal} />}
         </>
     );
+
 };
 
 export default LiveChatBox;
