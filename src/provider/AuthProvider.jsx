@@ -1,87 +1,101 @@
-import { createContext, useContext, useState, useEffect, use } from "react";
-import axios from "../api/AxiosInterceptor";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const navi = useNavigate();
   const [auth, setAuth] = useState({
-    memberInfo: null,
-    isAuthenticated: false,
+    user: {
+      memberNo: null,
+      email: null,
+      memberPw: null,
+      memberName: null,
+      accessToken: null,
+      refreshToken: null,
+      isAuthenticated: false, // 기존 : isLoggedIn: true
+    },
   });
 
   useEffect(() => {
-    axios
-      .post("/api/auth/refresh", { withCredentials: true })
-      .then((res) => {
-        console.log(res);
-        const memberInfo = res.data.data.memberInfo;
-        login(memberInfo);
-      })
-      .catch(() => {
-        // refresh 실패 → 비로그인 상태로
-        setAuth({
-          memberInfo: null,
-          isAuthenticated: false,
-        });
+    const memberNo = localStorage.getItem("memberNo");
+    const email = localStorage.getItem("email");
+    const memberName = localStorage.getItem("memberName");
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (memberNo && email && memberName && accessToken && refreshToken) {
+      setAuth({
+        user: {
+          memberNo,
+          email,
+          memberName,
+          accessToken,
+          refreshToken,
+          isAuthenticated: true,
+        },
       });
+    }
   }, []);
 
-  const login = (memberInfo) => {
+  const login = (memberNo, email, memberName, accessToken, refreshToken) => {
     setAuth({
-      memberInfo: memberInfo,
-      isAuthenticated: true,
+      user: {
+        memberNo,
+        email,
+        memberName,
+        accessToken,
+        refreshToken,
+        isAuthenticated: true,
+      },
     });
-    if (memberInfo !== null) {
-      sessionStorage.setItem("memberInfo", JSON.stringify(memberInfo));
-    }
-    sessionStorage.setItem("isAuthenticated", true);
+    localStorage.setItem("memberNo", memberNo);
+    localStorage.setItem("email", email);
+    localStorage.setItem("memberName", memberName);
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
   };
 
   const logout = () => {
-    axios
-      .delete(`http://localhost:8080/api/auth/logout`, {
-        withCredentials: true,
-      })
-      .then(() => {
-        setAuth({
-          memberInfo: null,
-          isAuthenticated: false,
-        });
-        alert("로그아웃 되었습니다.");
-      })
-      .catch((err) => {
-        alert(err);
-      });
-    sessionStorage.clear();
     setAuth({
-      memberInfo: null,
-      isAuthenticated: false,
+      user: {
+        email: null,
+        memberName: null,
+        memberPw: null,
+        accessToken: null,
+        refreshToken: null,
+        isAuthenticated: false,
+      },
     });
-    sessionStorage.removeItem("memberInfo");
-    sessionStorage.removeItem("isAuthenticated");
-    navi("/");
+    localStorage.removeItem("memberNo");
+    localStorage.removeItem("email");
+    localStorage.removeItem("memberName");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    alert("로그아웃 되었습니다.");
+    window.location.href = "/";
   };
 
-  const deleteAccount = () => {
-    axios
-      .delete(`http://localhost:8080/api/member/delete`, {
-        withCredentials: true,
-      })
-      .finally(() => {
-        setAuth({
-          memberInfo: null,
-          isAuthenticated: false,
-        });
-        alert("회원 탈퇴가 완료 되었습니다.");
-        navi("/");
-      });
-    sessionStorage.clear();
+  const cancel = () => {
+    setAuth({
+      user: {
+        email: null,
+        memberName: null,
+        memberPw: null,
+        accessToken: null,
+        refreshToken: null,
+        isAuthenticated: false,
+      },
+    });
+    localStorage.removeItem("email");
+    localStorage.removeItem("memberNo");
+    localStorage.removeItem("memberName");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    alert("회원 탈퇴가 완료 되었습니다.");
+    window.location.href = "/";
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, deleteAccount }}>
+    <AuthContext.Provider value={{ auth, login, logout, cancel }}>
       {children}
     </AuthContext.Provider>
   );

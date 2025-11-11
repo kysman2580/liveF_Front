@@ -1,4 +1,3 @@
-// ...existing code...
 import React from "react";
 import {
   CSidebar,
@@ -11,49 +10,28 @@ import {
 import CIcon from "@coreui/icons-react";
 import { cilPuzzle } from "@coreui/icons";
 import { Image, Item } from "./Sidebar.styles";
-import { useNavigate, useLocation } from "react-router-dom";
-
-const LEAGUE_IDS = {
-  PL: 39,
-  LALIGA: 140,
-  BUNDESLIGA: 78,
-  SERIEA: 135,
-  LIGUE1: 61,
-};
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const navi = useNavigate();
-  const location = useLocation();
-
-  // 현재 URL 쿼리에서 leagueId 읽기
-  const params = new URLSearchParams(location.search);
-  const selectedLeagueId = params.get('leagueId') ? Number(params.get('leagueId')) : null;
-
-  const navigateToLeague = (id) => {
-    navi(`/?leagueId=${id}`);
-  }
-
-  const isActive = (id) => selectedLeagueId === id;
-
   return (
     <CSidebar position="static" className="border-end">
       <CSidebarNav>
         <CNavTitle>Nav Title</CNavTitle>
-
-        <Item className={isActive(LEAGUE_IDS.PL) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.PL)}>
+        <Item onClick={() => navi("/")}>
           <Image src="/league icons/PL.png" alt="" />
           Premier League
         </Item>
-        <Item className={isActive(LEAGUE_IDS.LALIGA) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.LALIGA)}>
+        <Item onClick={() => navi("/LaLiga")}>
           <Image src="/league icons/laliga.png" alt="" /> La Liga
         </Item>
-        <Item className={isActive(LEAGUE_IDS.BUNDESLIGA) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.BUNDESLIGA)}>
+        <Item onClick={() => navi("/Bundesliga")}>
           <Image src="/league icons/bundesliga.png" alt="" /> Bundesliga
         </Item>
-        <Item className={isActive(LEAGUE_IDS.SERIEA) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.SERIEA)}>
+        <Item onClick={() => navi("/SerieA")}>
           <Image src="/league icons/serie A.png" alt="" /> Serie A
         </Item>
-        <Item className={isActive(LEAGUE_IDS.LIGUE1) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.LIGUE1)}>
+        <Item onClick={() => navi("/Ligue1")}>
           <Image src="/league icons/league 1.png" alt="" /> Ligue 1
         </Item>
         <CNavGroup
