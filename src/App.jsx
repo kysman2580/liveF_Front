@@ -4,24 +4,29 @@ import { Route, Routes } from "react-router-dom";
 import UserLayout from "./common/layout/UserLayout";
 import AdminLayout from "./common/layout/AdminLayout";
 import UserMain from "./components/userInterface/main/UserMain";
-import LogIn from "./components/userInterface/member/LogIn";
+import MyPage from "./components/userInterface/member/myPage";
+import TeamDetails from "./components/userInterface/teams/TeamDetails";
+import { AuthProvider } from "./provider/AuthProvider";
+import OauthSuccess from "./components/userInterface/member/OauthSuccess";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
-      <Routes>
-        <Route element={<UserLayout />}>
-          <Route path="/" element={<UserMain />} />
-        </Route>
-
-        <Route path="/admin" element={<AdminLayout />}></Route>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route element={<UserLayout />}>
+            <Route path="/" element={<UserMain />} />
+            <Route path="/MyPage" element={<MyPage />} />
+            <Route path="/community" element={<UserMain />} />
+            <Route path="/community/:id" element={<UserMain />} />
+            <Route path="/teamDetails" element={<TeamDetails />} />
+            <Route path="/oauth/success" element={<OauthSuccess />} />
+          </Route>
+          <Route path="/admin" element={<AdminLayout />}></Route>
+        </Routes>
+      </AuthProvider>
     </>
   );
 }
-
-
 
 export default App;
