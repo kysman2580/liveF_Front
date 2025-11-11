@@ -1,3 +1,5 @@
+// LiveChatBox.jsx (최종 완성본 - CSRF 로직 제거)
+
 import React, { useState, useEffect, useRef } from "react";
 import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
