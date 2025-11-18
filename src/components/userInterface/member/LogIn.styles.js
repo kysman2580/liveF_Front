@@ -78,6 +78,7 @@ export const HelperLink = styled.a`
   &:hover {
     text-decoration: underline;
   }
+  cursor: pointer;
 `;
 
 export const Actions = styled.div`

@@ -8,14 +8,16 @@ axios.interceptors.response.use(
   async (err) => {
     const original = err.config;
 
+    if (original.url === "/api/auth/refresh") {
+      return Promise.reject(err); // 여기서 끝 → AuthProvider의 .catch로 감
+    }
+
     if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
       try {
         await axios.post("/api/auth/refresh"); // 쿠키 자동 전송됨
         return axios(original); // 원래 요청 다시 시도
-      } catch (e) {
-        window.location.href = "/login";
-      }
+      } catch (e) {}
     }
 
     return Promise.reject(err);
