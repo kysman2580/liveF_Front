@@ -44,6 +44,7 @@ const LogIn = ({ setOpenLogInModal }) => {
       })
       .catch((error) => {
         console.error("There was an error!", error);
+        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
       });
   };
 
@@ -92,11 +93,14 @@ const LogIn = ({ setOpenLogInModal }) => {
           </Field>
 
           <Row>
-            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="checkbox" />
-              <span>로그인 상태 유지</span>
-            </label>
-            <HelperLink href="#">비밀번호 찾기</HelperLink>
+            <HelperLink
+              onClick={() => {
+                setOpenLogInModal(false);
+                navi("/changePassword");
+              }}
+            >
+              비밀번호 찾기
+            </HelperLink>
           </Row>
 
           <Actions>
