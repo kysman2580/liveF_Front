@@ -78,8 +78,8 @@ export const Input = styled.input`
   outline: none;
 
   &:focus {
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-weak);
   }
 `;
 
@@ -93,7 +93,7 @@ export const Row = styled.div`
 `;
 
 export const HelperLink = styled.a`
-  color: #4f46e5;
+  color: var(--primary);
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -113,7 +113,7 @@ export const PrimaryBtn = styled.button`
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: var(--primary);
   color: white;
 
   &:hover {

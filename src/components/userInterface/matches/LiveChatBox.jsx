@@ -8,7 +8,6 @@ import "./LiveChatBox.css";
 
 const MAX_MESSAGES = 100;
 
-
 const LiveChatBox = ({ leagueId = 39 }) => {
   const { auth } = useAuth();
   const [input, setInput] = useState("");

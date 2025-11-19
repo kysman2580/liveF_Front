@@ -5,55 +5,87 @@
   color: #222;
   margin-bottom: 2px;
 }
+
 .team-name-en {
   display: block;
-  font-size: 0.98rem;
+  font-size: 13px;
   color: #6b7280;
   font-weight: 400;
   letter-spacing: 0.01em;
 }
+
 .team-logo {
-  width: 54px;
-  height: 54px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
   display: block;
-  margin: 0 auto 8px auto;
-  background: #f7fafd;
+  background: var(--bg);
   border-radius: 8px;
   box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.08);
 }
+
 /* 리그별 팀 카드 리스트 스타일 */
 .LeagueTeamList {
   margin: 32px 0 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  justify-content: flex-start;
-  max-width: 1000px;
-  width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  justify-content: start;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .TeamCard {
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.10);
-  padding: 16px 24px;
-  min-width: 270px;
+  border-radius: 18px;
+  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.08);
+  padding: 18px 20px;
+  width: 100%;
   text-align: center;
-  font-size: 1.08rem;
-  font-weight: 500;
-  color: #1a2980;
-  transition: transform 0.12s, box-shadow 0.12s;
+  font-size: 1.06rem;
+  font-weight: 600;
+  color: var(--primary-2);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  gap: 8px;
 }
 .TeamCard:hover {
-  transform: translateY(-4px) scale(1.04);
-  box-shadow: 0 8px 24px 0 rgba(42, 67, 101, 0.18);
-  background: #f7fafd;
+  transform: translateY(-6px);
+  box-shadow: 0 12px 36px rgba(11, 35, 64, 0.08);
+  background: rgba(59, 130, 246, 0.03);
 }
 .no-teams {
   color: #aaa;
   padding: 32px 0;
   width: 100%;
   text-align: center;
+}
+
+/* Responsive: 2 cols on small screens, 3 cols on medium */
+@media (max-width: 1100px) {
+  .LeagueTeamList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .LeagueTeamList {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .team-logo {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 420px) {
+  .LeagueTeamList {
+    grid-template-columns: 1fr;
+  }
 }

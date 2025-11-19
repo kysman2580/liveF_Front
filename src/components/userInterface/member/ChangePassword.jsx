@@ -71,7 +71,7 @@ const FindPassword = () => {
       })
       .then(() => {
         alert("비밀번호가 성공적으로 변경되었습니다.");
-        window.location.href = "/login"; // 변경 후 로그인 페이지로 이동
+        window.location.href = "/";
       })
       .catch(() => {
         alert("비밀번호 변경 중 오류가 발생했습니다.");
@@ -80,7 +80,7 @@ const FindPassword = () => {
 
   return (
     <Container>
-      <Logo>NAVER</Logo>
+      <Logo>LiveF</Logo>
       <SubText>비밀번호를 찾고자 하는 아이디를 입력해주세요.</SubText>
 
       {/*  아이디 확인 폼 */}
@@ -127,7 +127,7 @@ const FindPassword = () => {
       </LinkBox> */}
 
       <Footer>
-        <FooterText>NAVER | 회원정보 고객센터</FooterText>
+        <FooterText>LiveF | 회원정보 고객센터</FooterText>
       </Footer>
     </Container>
   );

@@ -1,4 +1,74 @@
+:root {
+  /* Theme tokens - single neutral primary (no gradients) */
+  --primary: #2563eb; /* 무난한 블루 */
+  --primary-weak: rgba(37, 99, 235, 0.08);
+  --text: #222222;
+  --muted: #6b7280;
+  --bg: #fafafa;
+  --card-radius: 12px;
+  --container-max-width: 1200px;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Global background and container for Option A (soft-blue) */
+body {
+  background: linear-gradient(180deg, #f7f9fc 0%, #fbfdff 100%);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 220px 1fr 300px;
+  gap: 24px;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+.app-main {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 30px 50px;
+}
+
+.right-col {
+  display: block;
+  padding-left: 8px;
+  min-height: 600px;
+  padding-top: 24px;
+}
+
+/* Make left sidebar and right column blend with page background (no white card) */
+.layout-grid .left-col .c-sidebar,
+.layout-grid .left-col .c-sidebar * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.layout-grid .right-col {
+  background: transparent;
+  box-shadow: none;
+  border-left: 1px solid rgba(11, 35, 64, 0.04);
+}
+
+/* Gentle card defaults to improve consistency */
+section {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  box-shadow: 0 6px 18px rgba(11, 35, 64, 0.04);
+  border: 1px solid rgba(11, 35, 64, 0.04);
+}
+
+/* Utility for floated panel look */
+.panel-floating {
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(11, 35, 64, 0.06);
+}

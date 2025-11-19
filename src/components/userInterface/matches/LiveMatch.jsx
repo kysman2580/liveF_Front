@@ -1,4 +1,3 @@
-import LiveTvIcon from "@mui/icons-material/LiveTv";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import LiveMatchList from "./LiveMatchList";
 import LeagueTeamList from "./LeagueTeamList";
@@ -24,12 +23,10 @@ const LiveMatch = () => {
   return (
     <>
       <div className="LeagueNameWrap">
-        <div className="TvIconWrap">
-          <LiveTvIcon className="LiveTvIcon" fontSize="large" />
-        </div>
-
         <div>
-          <h2 className="LeagueName">{leagueInfo.displayName}</h2>
+          <h2 className="LeagueName" style={{ color: "black" }}>
+            {leagueInfo.displayName}
+          </h2>
           <h2 className="explain">실시간 경기 정보를 확인하세요</h2>
         </div>
       </div>
@@ -41,7 +38,9 @@ const LiveMatch = () => {
       <LiveMatchList />
 
       <div className="LeagueTeam">
-        <div className="LeagueTeamTitle">{leagueInfo.displayName} 팀 리스트</div>
+        <div className="LeagueTeamTitle">
+          {leagueInfo.displayName} 팀 리스트
+        </div>
         <LeagueTeamList leagueName={leagueInfo.listName} />
       </div>
     </>
