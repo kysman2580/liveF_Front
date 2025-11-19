@@ -1,4 +1,13 @@
+:root {
+  /* Theme tokens - single neutral primary (no gradients) */
+  --primary: #2563eb; /* 무난한 블루 */
+  --primary-weak: rgba(37, 99, 235, 0.08);
+  --text: #222222;
+  --muted: #6b7280;
+  --bg: #fafafa;
+  --card-radius: 12px;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-

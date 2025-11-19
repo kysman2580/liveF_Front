@@ -13,30 +13,36 @@ export const Item = styled.div`
   cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 12px;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #222;
   margin: 0.125rem 0;
-
+  font-family: "Montserrat", "Noto Sans KR", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   position: relative;
+  transition: background-color 0.18s, transform 0.12s, color 0.18s;
 
   &:hover {
-    background-color: #f8f7ff; /* 연한 보라빛 계열 */
-    transition: background-color 0.18s ease, transform 0.12s ease;
-    transform: translateX(2px);
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #1976d2;
+    transform: translateX(2px) scale(1.04);
   }
 
-  /* active 상태 스타일 - 왼쪽 인디케이터 추가 */
   &.active {
     background: linear-gradient(
       90deg,
-      rgba(123, 97, 255, 0.12),
-      rgba(168, 108, 255, 0.06)
+      rgba(6, 182, 212, 0.1),
+      rgba(59, 130, 246, 0.08)
     );
-    color: #2b2b2b;
-    font-weight: 700;
-    box-shadow: 0 6px 14px rgba(109, 75, 255, 0.06);
+    color: #1976d2;
+    font-weight: 800;
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.09);
     padding-left: 0.75rem;
+    letter-spacing: 0.12em;
   }
 
   &.active::before {
@@ -46,7 +52,11 @@ export const Item = styled.div`
     top: 6px;
     bottom: 6px;
     width: 4px;
-    border-radius: 0 6px 6px 0;
-    background: linear-gradient(180deg, #7b61ff 0%, #a86cff 100%);
+    border-radius: 0 8px 8px 0;
+    background: linear-gradient(
+      180deg,
+      var(--primary-1) 0%,
+      var(--primary-2) 100%
+    );
   }
 `;

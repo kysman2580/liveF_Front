@@ -80,7 +80,7 @@ const FindPassword = () => {
 
   return (
     <Container>
-      <Logo>NAVER</Logo>
+      <Logo>LiveF</Logo>
       <SubText>비밀번호를 찾고자 하는 아이디를 입력해주세요.</SubText>
 
       {/*  아이디 확인 폼 */}
@@ -127,7 +127,7 @@ const FindPassword = () => {
       </LinkBox> */}
 
       <Footer>
-        <FooterText>NAVER | 회원정보 고객센터</FooterText>
+        <FooterText>LiveF | 회원정보 고객센터</FooterText>
       </Footer>
     </Container>
   );

@@ -1,18 +1,22 @@
 import styled from "styled-components";
 
 export const Brand = styled.div`
-  font-weight: 800;
-  font-size: 1.25rem;
-  color: #6d4bff; /* 보라톤 브랜드 색상 */
+  font-family: "Montserrat", "Noto Sans KR", Arial, sans-serif;
+  font-weight: 900;
+  font-size: 1.35rem;
+  color: var(--primary);
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
 `;
 
 export const LogoDot = styled.span`
   width: 10px;
   height: 10px;
-  background: linear-gradient(90deg, #7b61ff, #a86cff);
+  background: var(--primary);
   border-radius: 50%;
   display: inline-block;
 `;
@@ -21,21 +25,25 @@ export const NavAction = styled.button`
   background: transparent;
   border: 1px solid transparent;
   color: #333;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 6px 14px;
+  border-radius: 7px;
   margin-left: 8px;
-  font-weight: 600;
+  font-family: "Montserrat", "Noto Sans KR", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover {
-    background: rgba(109, 75, 255, 0.08);
-    color: #6d4bff;
-    transform: translateY(-1px);
+    background: var(--primary-weak);
+    color: var(--primary);
+    transform: translateY(-1px) scale(1.04);
   }
 
   &.primary {
-    background: linear-gradient(90deg, #7b61ff, #a86cff);
+    background: var(--primary);
     color: #fff;
     border: none;
   }

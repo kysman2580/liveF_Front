@@ -8,7 +8,7 @@ export const Container = styled.div`
 `;
 
 export const Logo = styled.h1`
-  color: #03c75a;
+  color: #2196f3;
   font-size: 32px;
   font-weight: 800;
   margin-bottom: 10px;
@@ -37,13 +37,13 @@ export const Input = styled.input`
   transition: border-color 0.2s;
 
   &:focus {
-    border-color: #03c75a;
+    border-color: #2196f3;
   }
 `;
 
 export const Button = styled.button`
   height: 48px;
-  background-color: #03c75a;
+  background-color: #2196f3;
   color: white;
   border: none;
   border-radius: 6px;
@@ -53,7 +53,7 @@ export const Button = styled.button`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #02b356;
+    background-color: #1976d2;
   }
 `;
 
@@ -64,7 +64,7 @@ export const LinkBox = styled.div`
 `;
 
 export const FindLink = styled.a`
-  color: #03c75a;
+  color: #2196f3;
   text-decoration: none;
 
   &:hover {

@@ -14,7 +14,7 @@ import { Brand, LogoDot, NavAction, RightControls } from "./Header.styles";
 
 const Header = () => {
   const navi = useNavigate();
-  
+
   const [openLogInModal, setOpenLogInModal] = useState(false);
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
   const { auth, logout } = useAuth();
