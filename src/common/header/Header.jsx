@@ -10,10 +10,11 @@ import {
 import LogIn from "../../components/userInterface/member/LogIn";
 import SignUp from "../../components/userInterface/member/SignUp";
 import { useAuth } from "../../provider/AuthProvider";
+import { Brand, LogoDot, NavAction, RightControls } from "./Header.styles";
 
 const Header = () => {
-  const [visible, setVisible] = useState(false);
   const navi = useNavigate();
+  
   const [openLogInModal, setOpenLogInModal] = useState(false);
   const [openSignUpModal, setOpenSignUpModal] = useState(false);
   const { auth, logout } = useAuth();
@@ -22,56 +23,40 @@ const Header = () => {
     <>
       <CHeader position="sticky" className="mb-4 border-bottom">
         <div className="d-flex align-items-center w-100 px-3 justify-content-between">
-          <CHeaderBrand
-            className="mb-0"
-            onClick={() => navi("/")}
-            style={{ cursor: "pointer" }}
-          >
-            LiveF
+          <CHeaderBrand className="mb-0" onClick={() => navi("/")}>
+            <Brand>
+              <LogoDot />
+              LiveF
+            </Brand>
           </CHeaderBrand>
 
           <CHeaderNav className="ms-auto">
             {/* 로그인 상태에 따라 토글 */}
             {auth.isAuthenticated ? (
-              <>
+              <RightControls>
                 <CNavItem>
-                  <CNavLink
-                    onClick={() => navi("/MyPage")}
-                    style={{ cursor: "pointer" }}
-                    title="마이페이지"
-                  >
-                    MyPage
-                  </CNavLink>
+                  <NavAction onClick={() => navi("/MyPage")}>MyPage</NavAction>
                 </CNavItem>
                 <CNavItem>
-                  <CNavLink
-                    onClick={logout} // 바로 컨텍스트의 logout 호출
-                    style={{ cursor: "pointer" }}
-                    title="로그아웃"
-                  >
-                    LogOut
-                  </CNavLink>
+                  <NavAction onClick={logout}>LogOut</NavAction>
                 </CNavItem>
-              </>
+              </RightControls>
             ) : (
-              <>
+              <RightControls>
                 <CNavItem>
-                  <CNavLink
-                    onClick={() => setOpenLogInModal(true)}
-                    style={{ cursor: "pointer" }}
-                  >
+                  <NavAction onClick={() => setOpenLogInModal(true)}>
                     LogIn
-                  </CNavLink>
+                  </NavAction>
                 </CNavItem>
                 <CNavItem>
-                  <CNavLink
+                  <NavAction
+                    className="primary"
                     onClick={() => setOpenSignUpModal(true)}
-                    style={{ cursor: "pointer" }}
                   >
                     SignUp
-                  </CNavLink>
+                  </NavAction>
                 </CNavItem>
-              </>
+              </RightControls>
             )}
           </CHeaderNav>
         </div>

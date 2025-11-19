@@ -5,7 +5,6 @@ import {
   CSidebarHeader,
   CSidebarNav,
   CSidebarToggler,
-  CNavGroup,
   CNavTitle,
 } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
@@ -27,58 +26,51 @@ const Sidebar = () => {
 
   // 현재 URL 쿼리에서 leagueId 읽기
   const params = new URLSearchParams(location.search);
-  const selectedLeagueId = params.get('leagueId') ? Number(params.get('leagueId')) : null;
+  const selectedLeagueId = params.get("leagueId")
+    ? Number(params.get("leagueId"))
+    : null;
 
   const navigateToLeague = (id) => {
     navi(`/?leagueId=${id}`);
-  }
+  };
 
   const isActive = (id) => selectedLeagueId === id;
 
   return (
     <CSidebar position="static" className="border-end">
       <CSidebarNav>
-        <CNavTitle>Nav Title</CNavTitle>
+        <CNavTitle>LEAGUE</CNavTitle>
 
-        <Item className={isActive(LEAGUE_IDS.PL) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.PL)}>
+        <Item
+          className={isActive(LEAGUE_IDS.PL) ? "active" : ""}
+          onClick={() => navigateToLeague(LEAGUE_IDS.PL)}
+        >
           <Image src="/league icons/PL.png" alt="" />
           Premier League
         </Item>
-        <Item className={isActive(LEAGUE_IDS.LALIGA) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.LALIGA)}>
+        <Item
+          className={isActive(LEAGUE_IDS.LALIGA) ? "active" : ""}
+          onClick={() => navigateToLeague(LEAGUE_IDS.LALIGA)}
+        >
           <Image src="/league icons/laliga.png" alt="" /> La Liga
         </Item>
-        <Item className={isActive(LEAGUE_IDS.BUNDESLIGA) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.BUNDESLIGA)}>
+        <Item
+          className={isActive(LEAGUE_IDS.BUNDESLIGA) ? "active" : ""}
+          onClick={() => navigateToLeague(LEAGUE_IDS.BUNDESLIGA)}
+        >
           <Image src="/league icons/bundesliga.png" alt="" /> Bundesliga
         </Item>
-        <Item className={isActive(LEAGUE_IDS.SERIEA) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.SERIEA)}>
-          <Image src="/league icons/serie A.png" alt="" /> Serie A
-        </Item>
-        <Item className={isActive(LEAGUE_IDS.LIGUE1) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.LIGUE1)}>
-          <Image src="/league icons/league 1.png" alt="" /> Ligue 1
-        </Item>
-        <CNavGroup
-          toggler={
-            <>
-              <CIcon customClassName="nav-icon" icon={cilPuzzle} /> Nav dropdown
-            </>
-          }
+        <Item
+          className={isActive(LEAGUE_IDS.SERIEA) ? "active" : ""}
+          onClick={() => navigateToLeague(LEAGUE_IDS.SERIEA)}
         >
-          <Item onClick={() => navi("/")}>
-            <span className="nav-icon">
-              <span className="nav-icon-bullet"></span>
-            </span>{" "}
-            Nav dropdown item
-          </Item>
-          <Item onClick={() => navi("/")}>
-            <span className="nav-icon">
-              <span className="nav-icon-bullet"></span>
-            </span>{" "}
-            Nav dropdown item
-          </Item>
-        </CNavGroup>
-        <CNavTitle>My Team</CNavTitle>
-        <Item onClick={() => navi("/")}>
           <Image src="/league icons/serie A.png" alt="" /> Serie A
+        </Item>
+        <Item
+          className={isActive(LEAGUE_IDS.LIGUE1) ? "active" : ""}
+          onClick={() => navigateToLeague(LEAGUE_IDS.LIGUE1)}
+        >
+          <Image src="/league icons/league 1.png" alt="" /> Ligue 1
         </Item>
       </CSidebarNav>
       <CSidebarHeader className="border-top">
