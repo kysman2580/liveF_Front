@@ -119,22 +119,83 @@ const LiveMatchList = () => {
                 console.log('✅ Mock 데이터 로드 완료:', convertedData);
             }, 500);
         } else {
-            axios.get(`${API_URL}/api/v1/feed/fixtures?leagueId=${currentLeagueId}`)
+            let apiUrl = `${API_URL}/api/v1/feed/fixtures`;
+            if (currentLeagueId !== 'all') {
+                apiUrl += `?leagueId=${currentLeagueId}`;
+            }
+
+            console.log(`🌐 API 호출: ${apiUrl}`);
+
+            axios.get(apiUrl)
                 .then(res => {
+                    console.log('🔍 API 원본 응답:', res.data);
+                    console.log('🔍 첫 번째 데이터 구조:', res.data[0]);
+
                     let fetchedData = Array.isArray(res.data) ? res.data : [];
 
-                    fetchedData = fetchedData.map(match => ({
-                        ...match,
-                        matchDay: getMatchDay(match.date, match.time)
-                    }));
+                    // 백엔드 DTO 형식에 맞게 변환
+                    fetchedData = fetchedData.map((match, index) => {
+                        let dateStr = 'unknown';
+                        let timeStr = '00:00';
+
+                        // kickoffTime이 배열 형식: [year, month, day, hour, minute]
+                        if (Array.isArray(match.kickoffTime) && match.kickoffTime.length >= 3) {
+                            const [year, month, day, hour = 0, minute = 0] = match.kickoffTime;
+
+                            // 날짜 형식: YYYY-MM-DD
+                            dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                            // 시간 형식: HH:MM
+                            timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                        }
+
+                        const matchDay = getMatchDay(dateStr, timeStr);
+
+                        if (index === 0) {
+                            console.log('🔍 변환 결과:', {
+                                원본kickoffTime: match.kickoffTime,
+                                dateStr,
+                                timeStr,
+                                matchDay
+                            });
+                        }
+
+                        return {
+                            // 원본 필드 모두 유지
+                            ...match,
+                            // 필요한 필드 추가/덮어쓰기
+                            date: dateStr,
+                            time: timeStr,
+                            matchDay: matchDay,
+                            fixtureId: match.fixtureId,
+                            homeTeamName: match.homeTeamName,
+                            awayTeamName: match.awayTeamName,
+                            homeTeamLogoUrl: match.homeTeamLogoUrl,
+                            awayTeamLogoUrl: match.awayTeamLogoUrl,
+                            score: match.score || '- - -',
+                            venue: match.venue || '-',
+                            leagueName: match.leagueName || '-',
+                            status: match.status || 'NS'
+                        };
+                    });
 
                     fetchedData = fetchedData.sort(sortMatchesByDateAsc);
+
+                    console.log('✅ 변환 완료된 데이터:', fetchedData);
+                    console.log('✅ 첫 번째 경기 샘플:', {
+                        date: fetchedData[0]?.date,
+                        time: fetchedData[0]?.time,
+                        matchDay: fetchedData[0]?.matchDay,
+                        home: fetchedData[0]?.homeTeamName,
+                        away: fetchedData[0]?.awayTeamName
+                    });
 
                     setMatches(fetchedData);
                     setError(null);
                 })
                 .catch(error => {
-                    console.error("Error fetching fixtures:", error);
+                    console.error("❌ Error fetching fixtures:", error);
+                    console.error("❌ Error details:", error.response?.data);
                     setMatches([]);
                     setError('경기 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
                 })
@@ -163,20 +224,41 @@ const LiveMatchList = () => {
         if (!Array.isArray(matches)) return {};
 
         const grouped = {};
-        matches.forEach(match => {
+        matches.forEach((match, index) => {
             const matchDay = match.matchDay || match.date;
+
+            // 디버깅: 처음 몇 개만 로그 출력
+            if (index < 3) {
+                console.log(`경기 ${index}:`, {
+                    matchDay: match.matchDay,
+                    date: match.date,
+                    fixtureDate: match.fixtureDate
+                });
+            }
+
             if (!grouped[matchDay]) {
                 grouped[matchDay] = [];
             }
             grouped[matchDay].push(match);
         });
 
+        console.log('그룹화된 날짜들:', Object.keys(grouped));
         return grouped;
     };
 
     const formatDateHeader = (dateStr) => {
+        console.log('formatDateHeader 입력:', dateStr); // 디버깅용
+
         if (!dateStr) return '';
-        const [year, month, day] = dateStr.split('-');
+
+        // dateStr이 'YYYY-MM-DD' 형식인지 확인
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) {
+            console.warn('잘못된 날짜 형식:', dateStr);
+            return dateStr; // 원본 반환
+        }
+
+        const [year, month, day] = parts;
         return `${month}/${day}`;
     };
 
@@ -283,33 +365,73 @@ const LiveMatchList = () => {
                                 <div className="MatchModalOverlay" onClick={handleCloseModal}>
                                     <div className="MatchModal" onClick={e => e.stopPropagation()}>
                                         <button className="close-modal-btn" onClick={handleCloseModal}>&times;</button>
+
+                                        {/* 리그 정보 */}
                                         <h2>{modalMatch.leagueName || 'Unknown League'}</h2>
+
+                                        {/* 팀 로고 및 스코어 */}
                                         <div className="modal-teams modal-teams-logos">
+                                            {/* 홈 팀 */}
                                             <div className="modal-team-block">
                                                 {modalMatch.homeTeamLogoUrl && (
                                                     <img
-                                                        src={modalMatch.homeTeamLogoUrl || "/placeholder.svg"}
+                                                        src={modalMatch.homeTeamLogoUrl}
                                                         alt={`${modalMatch.homeTeamName || 'Unknown'} 로고`}
                                                         className="modal-team-logo"
+                                                        onError={(e) => { e.target.src = "/placeholder.svg"; }}
                                                     />
                                                 )}
-                                                <span className="modal-team-ko">{modalMatch.homeTeamName || 'Unknown'}</span>
+                                                <span className="modal-team-ko">
+                                                    {modalMatch.homeTeamName || 'Unknown'}
+                                                </span>
                                             </div>
-                                            <span className="modal-score">{modalMatch.score || '0 - 0'}</span>
+
+                                            {/* 스코어 */}
+                                            <span className="modal-score">
+                                                {modalMatch.score || '0 - 0'}
+                                            </span>
+
+                                            {/* 원정 팀 */}
                                             <div className="modal-team-block">
                                                 {modalMatch.awayTeamLogoUrl && (
                                                     <img
-                                                        src={modalMatch.awayTeamLogoUrl || "/placeholder.svg"}
+                                                        src={modalMatch.awayTeamLogoUrl}
                                                         alt={`${modalMatch.awayTeamName || 'Unknown'} 로고`}
                                                         className="modal-team-logo"
+                                                        onError={(e) => { e.target.src = "/placeholder.svg"; }}
                                                     />
                                                 )}
-                                                <span className="modal-team-ko">{modalMatch.awayTeamName || 'Unknown'}</span>
+                                                <span className="modal-team-ko">
+                                                    {modalMatch.awayTeamName || 'Unknown'}
+                                                </span>
                                             </div>
                                         </div>
+
+                                        {/* 경기 상세 정보 */}
                                         <div className="modal-info">
-                                            <div><span>경기 상태</span> <b>{modalMatch.status || 'NS'}</b></div>
-                                            <div><span>경기장</span> <b>{modalMatch.venue || '-'}</b></div>
+                                            {/* 경기 일시 */}
+                                            <div>
+                                                <span>경기 일시</span>
+                                                <b>{modalMatch.date} {modalMatch.time}</b>
+                                            </div>
+
+                                            {/* 경기 상태 */}
+                                            <div>
+                                                <span>경기 상태</span>
+                                                <b>{modalMatch.status || 'NS'}</b>
+                                            </div>
+
+                                            {/* 경기장 */}
+                                            <div>
+                                                <span>경기장</span>
+                                                <b>{modalMatch.venue || '미정'}</b>
+                                            </div>
+
+                                            {/* 리그 */}
+                                            <div>
+                                                <span>대회</span>
+                                                <b>{modalMatch.leagueName || '-'}</b>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

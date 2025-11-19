@@ -1,4 +1,3 @@
-// ...existing code...
 import React from "react";
 import {
   CSidebar,
@@ -9,7 +8,7 @@ import {
   CNavTitle,
 } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
-import { cilPuzzle } from "@coreui/icons";
+import { cilPuzzle, cilCalendar } from "@coreui/icons";
 import { Image, Item } from "./Sidebar.styles";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -19,6 +18,7 @@ const LEAGUE_IDS = {
   BUNDESLIGA: 78,
   SERIEA: 135,
   LIGUE1: 61,
+  FRIENDLIES: 10, // 친선 경기
 };
 
 const Sidebar = () => {
@@ -27,18 +27,27 @@ const Sidebar = () => {
 
   // 현재 URL 쿼리에서 leagueId 읽기
   const params = new URLSearchParams(location.search);
-  const selectedLeagueId = params.get('leagueId') ? Number(params.get('leagueId')) : null;
+  const selectedLeagueId = params.get('leagueId') || null;
 
   const navigateToLeague = (id) => {
-    navi(`/?leagueId=${id}`);
+    if (id === 'all') {
+      navi('/'); // 모든 경기 보기
+    } else {
+      navi(`/?leagueId=${id}`);
+    }
   }
 
-  const isActive = (id) => selectedLeagueId === id;
+  const isActive = (id) => {
+    if (id === 'all') {
+      return selectedLeagueId === null;
+    }
+    return selectedLeagueId === String(id);
+  };
 
   return (
     <CSidebar position="static" className="border-end">
       <CSidebarNav>
-        <CNavTitle>Nav Title</CNavTitle>
+        <CNavTitle>주요 리그</CNavTitle>
 
         <Item className={isActive(LEAGUE_IDS.PL) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.PL)}>
           <Image src="/league icons/PL.png" alt="" />
@@ -56,6 +65,12 @@ const Sidebar = () => {
         <Item className={isActive(LEAGUE_IDS.LIGUE1) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.LIGUE1)}>
           <Image src="/league icons/league 1.png" alt="" /> Ligue 1
         </Item>
+
+        <Item className={isActive(LEAGUE_IDS.FRIENDLIES) ? 'active' : ''} onClick={() => navigateToLeague(LEAGUE_IDS.FRIENDLIES)}>
+          <CIcon customClassName="nav-icon" icon={cilCalendar} style={{ marginRight: '8px' }} />
+          친선 경기
+        </Item>
+
         <CNavGroup
           toggler={
             <>

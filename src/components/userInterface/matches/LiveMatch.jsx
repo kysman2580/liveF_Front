@@ -11,6 +11,7 @@ const LEAGUE_MAP = {
   78: { displayName: "Bundesliga", listName: "Bundesliga" },
   135: { displayName: "Serie A", listName: "Serie A" },
   61: { displayName: "Ligue 1", listName: "Ligue 1" },
+  10: { displayName: "친선 경기", listName: "FRIENDLIES" },
 };
 
 const LiveMatch = () => {
