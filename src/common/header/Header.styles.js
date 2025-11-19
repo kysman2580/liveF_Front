@@ -46,6 +46,10 @@ export const NavAction = styled.button`
     background: var(--primary);
     color: #fff;
     border: none;
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
   }
 `;
 
