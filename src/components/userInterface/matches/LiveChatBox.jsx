@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+import React, { useState, useEffect, useRef } from 'react';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
+import { useAuth } from '../../../provider/AuthProvider';
+import LogIn from '../member/LogIn';
+import './LiveChatBox.css';
+=======
 // LiveChatBox.jsx (최종 완성본 - CSRF 로직 제거)
 
 import React, { useState, useEffect, useRef } from "react";
@@ -6,10 +14,11 @@ import { Stomp } from "@stomp/stompjs";
 import { useAuth } from "../../../provider/AuthProvider";
 import LogIn from "../member/LogIn";
 import "./LiveChatBox.css";
+>>>>>>> d1a45383b6f8bad573feb52283ceb2dd909a59fb
+
 
 const MAX_MESSAGES = 100;
 
-// 💡 CSRF 보호를 해제했으므로, 토큰 추출 함수는 삭제되었습니다.
 
 const LiveChatBox = ({ leagueId = 39 }) => {
   const { auth } = useAuth();
@@ -147,6 +156,72 @@ const LiveChatBox = ({ leagueId = 39 }) => {
               const data = JSON.parse(msg.body);
               console.log("📩 메시지 수신:", data);
 
+<<<<<<< HEAD
+            const client = Stomp.over(socket);
+            // client.debug = (str) => console.log('STOMP:', str);
+
+            // 💡 CONNECT 헤더 설정 (CSRF 헤더 없음)
+            const connectHeaders = {
+                'X-Username': currentUser,
+                'heart-beat': '10000,10000'
+            };
+
+            console.log('📤 CONNECT 헤더 (CSRF 없음):', connectHeaders);
+
+            client.connect(
+                connectHeaders,
+                (frame) => {
+                    console.log('✅ STOMP 연결 성공!', frame);
+                    setConnected(true);
+                    setConnectionError(null);
+                    stompClient.current = client;
+
+                    const destination = `/topic/league-${leagueId}`;
+                    console.log(`📡 구독: ${destination}`);
+
+                    subscriptionRef.current = client.subscribe(destination, (msg) => {
+                        try {
+                            const data = JSON.parse(msg.body);
+                            console.log('📩 메시지 수신:', data);
+
+                            setMessages(prev => {
+                                const newMsg = {
+                                    id: Date.now() + Math.random(),
+                                    user: data.sender,
+                                    message: data.message,
+                                    timestamp: new Date(data.timestamp).toLocaleTimeString('ko-KR', {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }),
+                                    type: data.type.toLowerCase()
+                                };
+                                const updated = [...prev, newMsg];
+                                return updated.length > MAX_MESSAGES ? updated.slice(-MAX_MESSAGES) : updated;
+                            });
+                        } catch (e) {
+                            console.error('❌ 메시지 파싱 실패:', e);
+                        }
+                    });
+
+                    // 입장 메시지 전송
+                    client.send('/app/chat/enter', {}, JSON.stringify({
+                        type: 'ENTER',
+                        leagueId,
+                        sender: currentUser
+                    }));
+                },
+                (error) => {
+                    console.error('❌ STOMP 연결 실패:', error);
+                    console.error('Error Frame:', error);
+
+                    const errorMsg = error?.headers?.message || error?.body || 'Unknown error';
+                    setConnected(false);
+                    setConnectionError(`연결 실패: ${errorMsg}`);
+
+                    // 5초 후 재연결
+                    if (isLoggedIn) {
+                        reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
+=======
               setMessages((prev) => {
                 const newMsg = {
                   id: Date.now() + Math.random(),
@@ -157,6 +232,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
                     {
                       hour: "2-digit",
                       minute: "2-digit",
+>>>>>>> d1a45383b6f8bad573feb52283ceb2dd909a59fb
                     }
                   ),
                   type: data.type.toLowerCase(),
