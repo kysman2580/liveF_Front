@@ -1,15 +1,5 @@
-// ...existing code...
 import React from "react";
-import {
-  CSidebar,
-  CSidebarHeader,
-  CSidebarNav,
-  CSidebarToggler,
-  CNavTitle,
-} from "@coreui/react";
-import CIcon from "@coreui/icons-react";
-import { cilPuzzle } from "@coreui/icons";
-import { Image, Item } from "./Sidebar.styles";
+import { Image, Item, SidebarContainer } from "./Sidebar.styles";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const LEAGUE_IDS = {
@@ -24,7 +14,6 @@ const Sidebar = () => {
   const navi = useNavigate();
   const location = useLocation();
 
-  // 현재 URL 쿼리에서 leagueId 읽기
   const params = new URLSearchParams(location.search);
   const selectedLeagueId = params.get("leagueId")
     ? Number(params.get("leagueId"))
@@ -37,10 +26,8 @@ const Sidebar = () => {
   const isActive = (id) => selectedLeagueId === id;
 
   return (
-    <CSidebar position="static" className="border-end">
-      <CSidebarNav>
-        <CNavTitle>LEAGUE</CNavTitle>
-
+    <SidebarContainer>
+      <nav style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <Item
           className={isActive(LEAGUE_IDS.PL) ? "active" : ""}
           onClick={() => navigateToLeague(LEAGUE_IDS.PL)}
@@ -72,11 +59,9 @@ const Sidebar = () => {
         >
           <Image src="/league icons/league 1.png" alt="" /> Ligue 1
         </Item>
-      </CSidebarNav>
-      <CSidebarHeader className="border-top">
-        <CSidebarToggler />
-      </CSidebarHeader>
-    </CSidebar>
+      </nav>
+    </SidebarContainer>
   );
 };
+
 export default Sidebar;

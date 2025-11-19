@@ -72,9 +72,9 @@ button.category-btn:hover {
   align-items: center;
   justify-content: center;
   gap: 18px;
-  background: #ffffff;
-  padding: 24px 30px;
-  border-radius: 16px;
+  background: transparent; /* 카드 흰색 제거 */
+  padding: 8px 0; /* 패딩 축소로 여백 간결화 */
+  border-radius: 8px;
   width: fit-content;
 }
 
@@ -127,8 +127,8 @@ button.category-btn:hover {
   align-items: center;
   width: fit-content;
   margin-top: 5px;
-  border-radius: 16px;
-  background: #ffffff;
+  border-radius: 10px;
+  background: transparent; /* 배경 제거 */
 }
 
 .CalendarRow {

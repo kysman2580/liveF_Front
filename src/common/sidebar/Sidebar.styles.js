@@ -45,6 +45,18 @@ export const Item = styled.div`
     letter-spacing: 0.12em;
   }
 
+  /* Ensure active state remains visually consistent even on hover */
+  &.active:hover {
+    transform: none;
+    background: linear-gradient(
+      90deg,
+      rgba(6, 182, 212, 0.1),
+      rgba(59, 130, 246, 0.08)
+    );
+    color: #1976d2;
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.09);
+  }
+
   &.active::before {
     content: "";
     position: absolute;
@@ -59,4 +71,16 @@ export const Item = styled.div`
       var(--primary-2) 100%
     );
   }
+`;
+
+export const SidebarContainer = styled.aside`
+  width: 220px;
+  box-sizing: border-box;
+  padding: 12px 8px;
+  background: transparent; /* no white/blue box */
+  border-right: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
