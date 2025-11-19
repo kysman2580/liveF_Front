@@ -92,11 +92,13 @@ export const Input = styled.input`
 
 export const Btn = styled.button`
   border: none;
-  border-radius: 16px;
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  border-radius: 14px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+  transition: box-shadow 0.2s, transform 0.15s, background 0.2s;
 
   &:disabled {
     opacity: 0.5;
@@ -105,28 +107,35 @@ export const Btn = styled.button`
 `;
 
 export const PrimaryBtn = styled(Btn)`
-  background: #4f46e5;
+  background: linear-gradient(90deg, #2196f3 0%, #1976d2 100%);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.12);
 
   &:hover:not(:disabled) {
-    background: #4338ca;
+    background: linear-gradient(90deg, #1976d2 0%, #2196f3 100%);
+    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.18);
+    transform: translateY(-2px) scale(1.04);
   }
 `;
 
 export const SecondaryBtn = styled(Btn)`
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
 
   &:hover:not(:disabled) {
-    background: #f9fafb;
+    background: #f3f6fa;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.07);
   }
 `;
 
 export const DangerBtn = styled(Btn)`
-  background: #dc2626;
+  background: linear-gradient(90deg, #f44336 0%, #d32f2f 100%);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);
 
   &:hover:not(:disabled) {
-    background: #b91c1c;
+    background: linear-gradient(90deg, #d32f2f 0%, #f44336 100%);
+    box-shadow: 0 4px 16px rgba(244, 67, 54, 0.16);
+    transform: translateY(-2px) scale(1.04);
   }
 `;

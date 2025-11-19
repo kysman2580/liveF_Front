@@ -1,4 +1,4 @@
-.category{
+.category {
   display: flex;
   gap: 24px;
   background: none;
@@ -11,9 +11,9 @@
 }
 
 button.category-btn.active {
-  background: linear-gradient(90deg, #6a8dff 0%, #a259ff 100%);
+  background: var(--primary);
   color: #fff;
-  box-shadow: 0 4px 16px 0 #a259ff33;
+  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.2);
   opacity: 1;
 }
 
@@ -79,7 +79,7 @@ button.category-btn:hover {
 }
 
 .TvIconWrap {
-  background: linear-gradient(135deg, #6a8dff 0%, #a259ff 100%);
+  background: var(--primary);
   border-radius: 12px;
   width: 60px;
   height: 60px;
@@ -99,10 +99,7 @@ button.category-btn:hover {
 .LeagueName {
   font-size: 2.2rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #1a2980 0%, #a259ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
   margin: 0;
   height: 50px;
 }
@@ -114,12 +111,9 @@ button.category-btn:hover {
   margin-top: 7px;
 }
 
-
-
 /* ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ */
 
-
-.CalendarTodayIcon{
+.CalendarTodayIcon {
   display: flex;
   padding: 24px 32px;
   color: #2e45fa;
@@ -128,35 +122,32 @@ button.category-btn:hover {
   box-sizing: initial;
 }
 /* ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ */
-.CalendarWrap{
-    display: flex;
-    align-items: center;
-    width: fit-content;
-    margin-top: 5px;
-    border-radius: 16px;
-    background: #ffffff;
+.CalendarWrap {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 5px;
+  border-radius: 16px;
+  background: #ffffff;
 }
 
-.CalendarRow{
+.CalendarRow {
   display: flex;
   align-items: center;
 }
 
-
 .TodayMatchTitle {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-weight: 500;
   font-size: 1.5rem;
   color: #222;
   margin-left: 8px;
   letter-spacing: -0.5px;
   position: relative;
-
 }
 
-
 .TodayMatchTitle {
-  font-family: 'Montserrat';
+  font-family: "Montserrat";
   font-weight: 500;
   font-size: 1.5rem;
   color: #222;
@@ -166,7 +157,7 @@ button.category-btn:hover {
   left: -20px;
 }
 
-.LeagueNameRow{
+.LeagueNameRow {
   display: flex;
   justify-content: center;
   align-items: center;
