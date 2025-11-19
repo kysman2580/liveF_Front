@@ -478,12 +478,10 @@
 }
 /* 실시간 경기 리스트 스타일 */
 .LiveMatchList {
-  margin-top: 24px;
-  display: grid;
-  grid-template-rows: repeat(2, 1fr);
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-
-  gap: 0px;
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0px;
 }
 
 .match-header {
@@ -539,4 +537,119 @@
   color: #aaa;
   text-align: center;
   padding: 32px 0;
+}
+
+
+/*  */
+/* 날짜 네비게이션 스타일 개선 */
+.date-navigation {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  justify-content: center;
+  align-items: center;
+}
+
+.date-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 32px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.date-tab:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+}
+
+.date-tab.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #2563eb;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+  transform: translateY(-2px);
+}
+
+.date-tab-label {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  transition: color 0.3s ease;
+}
+
+.date-tab.active .date-tab-label {
+  color: #ffffff;
+}
+
+.date-tab-sublabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  transition: color 0.3s ease;
+}
+
+.date-tab.active .date-tab-sublabel {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 날짜 그룹 헤더 스타일 추가 */
+.date-group-header {
+    grid-column: 1 / -1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    margin-left: 24px;
+}
+
+.date-group-header:first-child {
+  margin-top: 0;
+}
+
+.date-group-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 12px 24px;
+  border-radius: 12px;
+  position: relative;
+}
+
+
+/* 경기 카드 내 날짜/시간 표시 스타일 개선 */
+.lmc-datetime {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lmc-date-display {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #64748b;
+  padding: 4px 10px;
+  background: rgba(248, 250, 252, 0.8);
+  border-radius: 6px;
+}
+
+.lmc-time-display {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3b82f6;
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 6px;
 }

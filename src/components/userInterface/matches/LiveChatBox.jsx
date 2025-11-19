@@ -1,5 +1,3 @@
-// LiveChatBox.jsx (최종 완성본 - CSRF 로직 제거)
-
 import React, { useState, useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
@@ -7,9 +5,9 @@ import { useAuth } from '../../../provider/AuthProvider';
 import LogIn from '../member/LogIn';
 import './LiveChatBox.css';
 
+
 const MAX_MESSAGES = 100;
 
-// 💡 CSRF 보호를 해제했으므로, 토큰 추출 함수는 삭제되었습니다.
 
 const LiveChatBox = ({ leagueId = 39 }) => {
     const { auth } = useAuth();
@@ -106,7 +104,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
             };
 
             const client = Stomp.over(socket);
-            client.debug = (str) => console.log('STOMP:', str);
+            // client.debug = (str) => console.log('STOMP:', str);
 
             // 💡 CONNECT 헤더 설정 (CSRF 헤더 없음)
             const connectHeaders = {
