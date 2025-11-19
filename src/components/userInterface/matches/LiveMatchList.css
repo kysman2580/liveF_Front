@@ -1,6 +1,5 @@
-
 .LiveMatchCard {
-  background: rgba(255,255,255,0.80);
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 1rem;
   box-shadow: 0 20px 25px -5px #0002, 0 8px 10px -6px #0002;
   padding: 0;
@@ -18,14 +17,21 @@
 .LiveMatchCard:hover {
   box-shadow: 0 24px 48px 0 #0003;
   transform: translateY(-4px) scale(0.82);
-  background: rgba(255,255,255,0.92);
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .LiveMatchCard .card-gradient {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(135deg, #3b82f6 5%, #8b5cf6 5%, #3b82f6 10%, #8b5cf6 10%, transparent 100%);
+  background: linear-gradient(
+    135deg,
+    #3b82f6 5%,
+    #8b5cf6 5%,
+    #3b82f6 10%,
+    #8b5cf6 10%,
+    transparent 100%
+  );
   opacity: 0.08;
   pointer-events: none;
   transition: opacity 0.3s;
@@ -60,7 +66,7 @@
   background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
   color: #fff;
   box-shadow: 0 2px 8px 0 #ef444422;
-  animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 .lmc-badge-dot {
   width: 8px;
@@ -138,7 +144,12 @@
 .lmc-vs-line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent 0%, #cbd5e1 50%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #cbd5e1 50%,
+    transparent 100%
+  );
 }
 .lmc-vs {
   padding: 0 16px;
@@ -164,18 +175,23 @@
   color: #2563eb;
 }
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
-
-
-
 
 /* 로그인 모달 */
 .login-modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.18);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.18);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -195,7 +211,6 @@
   margin-bottom: 22px;
   color: #222;
 }
-
 
 .lmc-dot {
   display: inline-block;
@@ -325,9 +340,15 @@
   font-weight: 400;
 }
 
-.lmc-possession { color: #2563eb; }
-.lmc-shots { color: #22c55e; }
-.lmc-yellow { color: #eab308; }
+.lmc-possession {
+  color: #2563eb;
+}
+.lmc-shots {
+  color: #22c55e;
+}
+.lmc-yellow {
+  color: #eab308;
+}
 .modal-teams-logos {
   gap: 32px;
   margin-bottom: 0;
@@ -368,7 +389,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(30,40,60,0.32);
+  background: rgba(30, 40, 60, 0.32);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -388,11 +409,17 @@
   flex-direction: column;
   gap: 22px;
   border: 1.5px solid #e0e7ef;
-  animation: modalPop 0.22s cubic-bezier(.6,1.5,.5,1) 1;
+  animation: modalPop 0.22s cubic-bezier(0.6, 1.5, 0.5, 1) 1;
 }
 @keyframes modalPop {
-  0% { transform: scale(0.92) translateY(30px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+  0% {
+    transform: scale(0.92) translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 .close-modal-btn {
   position: absolute;
@@ -470,7 +497,7 @@
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.10);
+  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.1);
   transition: background 0.2s;
 }
 .show-more-btn:hover {
