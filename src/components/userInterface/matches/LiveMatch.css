@@ -60,7 +60,7 @@ button.category-btn:hover {
 .LeagueTeamTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1a2980;
+  color: #000000;
   margin: 36px 0 16px 4px;
   letter-spacing: -0.5px;
 }
@@ -73,7 +73,7 @@ button.category-btn:hover {
   justify-content: center;
   gap: 18px;
   background: transparent; /* 카드 흰색 제거 */
-  padding: 8px 0; /* 패딩 축소로 여백 간결화 */
+  padding: 30px 50px; /* 패딩 축소로 여백 간결화 */
   border-radius: 8px;
   width: fit-content;
 }
@@ -116,7 +116,7 @@ button.category-btn:hover {
 .CalendarTodayIcon {
   display: flex;
   padding: 24px 32px;
-  color: #2e45fa;
+  color: #000000;
   justify-content: center;
   align-items: center;
   box-sizing: initial;
@@ -125,10 +125,11 @@ button.category-btn:hover {
 .CalendarWrap {
   display: flex;
   align-items: center;
-  width: fit-content;
-  margin-top: 5px;
   border-radius: 10px;
-  background: transparent; /* 배경 제거 */
+  background: transparent;
+  margin-right: 2px;
+  position: relative;
+  left: -30px;
 }
 
 .CalendarRow {
@@ -141,7 +142,6 @@ button.category-btn:hover {
   font-weight: 500;
   font-size: 1.5rem;
   color: #222;
-  margin-left: 8px;
   letter-spacing: -0.5px;
   position: relative;
 }

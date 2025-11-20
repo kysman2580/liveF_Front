@@ -4,18 +4,14 @@
   padding: 12px 0; /* keep some vertical padding but no white card */
   display: flex;
   flex-direction: column;
-  min-height: 360px;
+  min-height: 90vh;
   color: #0f172a;
   background-color: transparent; /* blend with page background */
   box-shadow: none;
-  position: relative;
-}
-/* typography + viewport fit */
-.live-chat-box {
+  position: fixed;
   box-sizing: border-box;
   font-family: Inter, "Noto Sans KR", system-ui, -apple-system, "Segoe UI",
     Roboto, "Helvetica Neue", Arial;
-  max-height: calc(100vh - 120px);
 }
 
 .chat-header {
@@ -24,11 +20,13 @@
   padding: 6px 0 12px 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: start;
   border-bottom: 1px solid #eef2f6;
+  border-top: 1px solid #eef2f6;
   margin-bottom: 12px;
+  gap: 41px;
 }
+
 .chat-header-left {
   display: flex;
   align-items: center;
@@ -67,6 +65,7 @@
   font-size: 0.85rem; /* smaller, muted */
   color: #64748b;
   margin-left: 8px;
+  margin-right: 10px;
 }
 .chat-messages {
   background: transparent;
@@ -78,16 +77,17 @@
   flex: 1 1 auto; /* allow messages to grow and push input to bottom */
 }
 
+.chat-msg{
+  font-size: 13px;
+}
+
 .chat-msg-talk {
   margin-bottom: 12px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
 }
 
-.chat-msg {
-  margin-bottom: 12px;
-}
 
 .chat-msg-icon {
   width: 32px;
@@ -120,21 +120,23 @@
 .chat-user {
   font-weight: 700;
   color: #0b2540;
-  margin-right: 6px;
-  font-size: 0.98rem;
+  margin-right: 8px; /* 마진 증가 */
+  font-size: 13px; /* 🌟 폰트 크기 키움 (기존 0.98rem) */
 }
 
 .chat-text {
   background: #f8fafc;
   color: #0b2540;
   border-radius: 12px;
-  padding: 8px 12px;
-  font-size: 0.98rem;
+  /* 🌟 패딩을 늘려 메시지 버블 크기 증가 */
+  padding: 10px 14px; 
+  font-size: 13px; /* 🌟 폰트 크기 키움 (기존 0.98rem) */
   box-shadow: none;
   margin-right: 2px;
 }
+
 .chat-time {
-  font-size: 0.95rem;
+  font-size: 13px; /* 🌟 폰트 크기 키움 (기존 0.95rem) */
   color: #94a3b8;
   margin-left: 2px;
   margin-top: 2px;
@@ -149,7 +151,6 @@
 }
 
 .chat-input {
-  flex: 1 1 0;
   border: 1px solid #e6eef8;
   border-radius: 10px;
   padding: 10px 12px;
@@ -186,6 +187,7 @@
   justify-content: center;
   font-size: 1.05rem;
   margin-left: 6px;
+  margin-right: 9px;
   box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.08);
   cursor: pointer;
   transition: background 0.12s, box-shadow 0.12s;

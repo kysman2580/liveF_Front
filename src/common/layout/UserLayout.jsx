@@ -19,7 +19,6 @@ export default function UserLayout() {
           </main>
 
           <aside className="right-col">
-            {/* Live chat panel on the right column. leagueId read from URL query */}
             <LiveChatBox leagueId={getLeagueIdFromLocation()} />
           </aside>
         </div>

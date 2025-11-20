@@ -21,15 +21,15 @@ const Header = () => {
 
   return (
     <>
-      <CHeader position="sticky" className="mb-4 border-bottom">
-        <div className="d-flex align-items-center w-100 px-3 justify-content-between">
+      <CHeader>
+        <div className="d-flex align-items-center w-100 px-3 justify-content-between custom-height-lg"
+          style={{ height: '70px' }}>
           <CHeaderBrand className="mb-0" onClick={() => navi("/")}>
             <Brand>
               <LogoDot />
               LiveF
             </Brand>
           </CHeaderBrand>
-
           <CHeaderNav className="ms-auto">
             {/* 로그인 상태에 따라 토글 */}
             {auth.isAuthenticated ? (
@@ -44,16 +44,13 @@ const Header = () => {
             ) : (
               <RightControls>
                 <CNavItem>
-                  <NavAction onClick={() => setOpenLogInModal(true)}>
-                    LogIn
+                  <NavAction className="primary" onClick={() => setOpenSignUpModal(true)}>
+                    SignUp
                   </NavAction>
                 </CNavItem>
                 <CNavItem>
-                  <NavAction
-                    className="primary"
-                    onClick={() => setOpenSignUpModal(true)}
-                  >
-                    SignUp
+                  <NavAction onClick={() => setOpenLogInModal(true)}>
+                    LogIn
                   </NavAction>
                 </CNavItem>
               </RightControls>

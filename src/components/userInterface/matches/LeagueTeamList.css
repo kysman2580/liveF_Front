@@ -5,23 +5,25 @@
   color: #222;
   margin-bottom: 2px;
 }
+
 .team-name-en {
   display: block;
-  font-size: 0.98rem;
+  font-size: 13px;
   color: #6b7280;
   font-weight: 400;
   letter-spacing: 0.01em;
 }
+
 .team-logo {
-  width: 54px;
-  height: 54px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
   display: block;
-  margin: 0 auto 8px auto;
   background: var(--bg);
   border-radius: 8px;
   box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.08);
 }
+
 /* 리그별 팀 카드 리스트 스타일 */
 .LeagueTeamList {
   margin: 32px 0 0 0;
@@ -36,7 +38,7 @@
 
 .TeamCard {
   background: #fff;
-  border-radius: 10px;
+  border-radius: 18px;
   box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.08);
   padding: 18px 20px;
   width: 100%;
@@ -48,7 +50,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: start;
   justify-content: center;
   gap: 8px;
 }

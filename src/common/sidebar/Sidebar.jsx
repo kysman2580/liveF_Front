@@ -1,5 +1,15 @@
 import React from "react";
-import { Image, Item, SidebarContainer } from "./Sidebar.styles";
+import {
+  CSidebar,
+  CSidebarHeader,
+  CSidebarNav,
+  CSidebarToggler,
+  CNavGroup,
+  CNavTitle,
+} from "@coreui/react";
+import CIcon from "@coreui/icons-react";
+import { cilPuzzle, cilCalendar } from "@coreui/icons";
+import { Image, Item } from "./Sidebar.styles";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const LEAGUE_IDS = {
@@ -8,6 +18,7 @@ const LEAGUE_IDS = {
   BUNDESLIGA: 78,
   SERIEA: 135,
   LIGUE1: 61,
+  FRIENDLIES: 10, // 친선 경기
 };
 
 const Sidebar = () => {
@@ -15,6 +26,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const params = new URLSearchParams(location.search);
+
   const selectedLeagueId = params.get("leagueId")
     ? Number(params.get("leagueId"))
     : null;
@@ -23,15 +35,21 @@ const Sidebar = () => {
     navi(`/?leagueId=${id}`);
   };
 
-  const isActive = (id) => selectedLeagueId === id;
+  const isActive = (id) => {
+    if (id === 'all') {
+      return selectedLeagueId === null;
+    }
+    return selectedLeagueId === String(id);
+  };
 
   return (
-    <SidebarContainer>
-      <nav style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <Item
-          className={isActive(LEAGUE_IDS.PL) ? "active" : ""}
-          onClick={() => navigateToLeague(LEAGUE_IDS.PL)}
-        >
+    <CSidebar position="static" className="border-end">
+      <CSidebarNav>
+        <CNavTitle>주요 리그</CNavTitle>
+
+        <Item className={isActive(LEAGUE_IDS.PL) ? 'active' : ''}
+          onClick={() => navigateToLeague(LEAGUE_IDS.PL)}>
+
           <Image src="/league icons/PL.png" alt="" />
           Premier League
         </Item>
@@ -59,8 +77,17 @@ const Sidebar = () => {
         >
           <Image src="/league icons/league 1.png" alt="" /> Ligue 1
         </Item>
-      </nav>
-    </SidebarContainer>
+
+        <Item className={isActive(LEAGUE_IDS.FRIENDLIES) ? 'active' : ''}
+          onClick={() => navigateToLeague(LEAGUE_IDS.FRIENDLIES)}>
+          <CIcon customClassName="nav-icon" icon={cilCalendar} style={{ marginRight: '8px', height: '40px', marginLeft: '13px' }} />
+          친선 경기
+        </Item>
+      </CSidebarNav >
+      <CSidebarHeader className="border-top border-bottom">
+        <CSidebarToggler />
+      </CSidebarHeader>
+    </CSidebar >
   );
 };
 

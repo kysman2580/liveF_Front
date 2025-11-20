@@ -1,11 +1,10 @@
-// LiveChatBox.jsx (최종 완성본 - CSRF 로직 제거)
-
 import React, { useState, useEffect, useRef } from "react";
 import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
 import { useAuth } from "../../../provider/AuthProvider";
 import LogIn from "../member/LogIn";
 import "./LiveChatBox.css";
+
 
 const MAX_MESSAGES = 100;
 
@@ -144,7 +143,6 @@ const LiveChatBox = ({ leagueId = 39 }) => {
             try {
               const data = JSON.parse(msg.body);
               console.log("📩 메시지 수신:", data);
-
               setMessages((prev) => {
                 const newMsg = {
                   id: Date.now() + Math.random(),

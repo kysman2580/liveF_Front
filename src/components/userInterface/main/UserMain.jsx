@@ -13,7 +13,7 @@ const UserMain = () => {
 
   return (
     <>
-      <div className="category" style={{ marginBottom: 32 }}>
+      {/* <div className="category" style={{ marginBottom: 32 }}>
         <button
           className={`category-btn${isLive ? " active" : ""}`}
           onClick={() => navigate("/")}
@@ -59,7 +59,7 @@ const UserMain = () => {
           </span>
           <span className="category-label">커뮤니티</span>
         </button>
-      </div>
+      </div> */}
 
       {isLive && <LiveMatch />}
       {isCommunityList && <Community />}

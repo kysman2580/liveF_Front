@@ -26,7 +26,6 @@ body {
   grid-template-columns: 220px 1fr 300px;
   gap: 24px;
   align-items: start;
-  padding: 28px 24px;
   box-sizing: border-box;
 }
 
@@ -35,15 +34,13 @@ body {
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
-  padding: 12px 20px;
+  padding: 30px 50px;
 }
 
 .right-col {
   display: block;
   padding-left: 8px;
-  border-left: 1px solid rgba(11, 35, 64, 0.04);
   min-height: 600px;
-  padding-top: 24px;
 }
 
 /* Make left sidebar and right column blend with page background (no white card) */

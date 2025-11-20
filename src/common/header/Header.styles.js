@@ -47,7 +47,7 @@ export const NavAction = styled.button`
     color: #fff;
     border: none;
     padding: 6px 12px;
-    border-radius: 18px;
+    border-radius: 7px;
     font-size: 0.95rem;
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
   }
@@ -57,3 +57,4 @@ export const RightControls = styled.div`
   display: flex;
   align-items: center;
 `;
+

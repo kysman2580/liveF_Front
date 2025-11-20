@@ -19,7 +19,7 @@ export const Item = styled.div`
   color: #222;
   margin: 0.125rem 0;
   font-family: "Montserrat", "Noto Sans KR", Arial, sans-serif;
-  font-size: 1rem;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;

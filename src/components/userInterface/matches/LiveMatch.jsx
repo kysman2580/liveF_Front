@@ -1,4 +1,3 @@
-import LiveTvIcon from "@mui/icons-material/LiveTv";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import LiveMatchList from "./LiveMatchList";
 import LeagueTeamList from "./LeagueTeamList";
@@ -11,6 +10,7 @@ const LEAGUE_MAP = {
   78: { displayName: "Bundesliga", listName: "Bundesliga" },
   135: { displayName: "Serie A", listName: "Serie A" },
   61: { displayName: "Ligue 1", listName: "Ligue 1" },
+  10: { displayName: "친선 경기", listName: "FRIENDLIES" },
 };
 
 const LiveMatch = () => {
@@ -23,10 +23,6 @@ const LiveMatch = () => {
   return (
     <>
       <div className="LeagueNameWrap">
-        <div className="TvIconWrap">
-          <LiveTvIcon className="LiveTvIcon" fontSize="large" />
-        </div>
-
         <div>
           <h2 className="LeagueName" style={{ color: "black" }}>
             {leagueInfo.displayName}
@@ -35,10 +31,6 @@ const LiveMatch = () => {
         </div>
       </div>
 
-      <div className="CalendarWrap">
-        <CalendarTodayIcon className="CalendarTodayIcon" />
-        <h2 className="TodayMatchTitle">오늘의 경기</h2>
-      </div>
       <LiveMatchList />
 
       <div className="LeagueTeam">

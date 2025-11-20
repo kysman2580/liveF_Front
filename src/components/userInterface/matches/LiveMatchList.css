@@ -337,17 +337,27 @@
 .lmc-yellow {
   color: #eab308;
 }
-.modal-teams-logos {
-  gap: 32px;
-  margin-bottom: 0;
-}
+
 .modal-team-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 90px;
+  min-width: 200px;
+  max-width: 140px;
   gap: 2px;
+  flex: 0 1 auto;
 }
+
+.modal-team-block:first-child {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.modal-team-block:last-child {
+  justify-content: flex-start;
+  text-align: left;
+}
+
 .modal-team-logo {
   width: 48px;
   height: 48px;
@@ -389,7 +399,7 @@
   border-radius: 20px;
   box-shadow: 0 12px 48px 0 rgba(42, 67, 101, 0.28);
   padding: 38px 44px 32px 44px;
-  min-width: 340px;
+  min-width: 600px;
   max-width: 96vw;
   max-height: 92vh;
   position: relative;
@@ -424,15 +434,16 @@
 .close-modal-btn:hover {
   color: var(--primary);
 }
+
 .modal-teams {
   display: flex;
   align-items: center;
-  gap: 18px;
-  font-size: 1.5rem;
-  font-weight: 700;
-  justify-content: center;
-  margin-bottom: 6px;
+  justify-content: space-between;
+  position: relative;
+  gap: 0;
+  min-height: 80px;
 }
+
 .modal-score {
   font-size: 2.1rem;
   font-weight: 800;
@@ -590,8 +601,8 @@
 .date-tab:hover {
   background: rgba(255, 255, 255, 0.95);
   border-color: var(--primary);
-  transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
 }
 
 .date-tab.active {
@@ -640,10 +651,13 @@
 .date-group-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
-  padding: 12px 24px;
+  color: black;
+  padding: 12px 26px;
   border-radius: 12px;
   position: relative;
+  border-color: #f2f6fe;
+  margin-left: 3px;
+  bottom: -37px;
 }
 
 /* 경기 카드 내 날짜/시간 표시 스타일 개선 */
