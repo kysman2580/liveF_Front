@@ -83,14 +83,8 @@ const Sidebar = () => {
           <CIcon customClassName="nav-icon" icon={cilCalendar} style={{ marginRight: '8px', height: '40px', marginLeft: '13px' }} />
           친선 경기
         </Item>
-
-
-        <CNavTitle>My Team</CNavTitle>
-        <Item onClick={() => navi("/")}>
-          <Image src="/league icons/serie A.png" alt="" /> Serie A
-        </Item>
       </CSidebarNav >
-      <CSidebarHeader className="border-top">
+      <CSidebarHeader className="border-top border-bottom">
         <CSidebarToggler />
       </CSidebarHeader>
     </CSidebar >

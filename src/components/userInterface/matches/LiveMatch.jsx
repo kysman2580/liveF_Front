@@ -31,10 +31,6 @@ const LiveMatch = () => {
         </div>
       </div>
 
-      <div className="CalendarWrap">
-        <CalendarTodayIcon className="CalendarTodayIcon" />
-        <h2 className="TodayMatchTitle">오늘의 경기</h2>
-      </div>
       <LiveMatchList />
 
       <div className="LeagueTeam">

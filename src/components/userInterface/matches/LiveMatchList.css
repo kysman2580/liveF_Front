@@ -601,8 +601,8 @@
 .date-tab:hover {
   background: rgba(255, 255, 255, 0.95);
   border-color: var(--primary);
-  transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
 }
 
 .date-tab.active {
@@ -651,10 +651,13 @@
 .date-group-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
-  padding: 12px 24px;
+  color: black;
+  padding: 12px 26px;
   border-radius: 12px;
   position: relative;
+  border-color: #f2f6fe;
+  margin-left: 3px;
+  bottom: -37px;
 }
 
 /* 경기 카드 내 날짜/시간 표시 스타일 개선 */

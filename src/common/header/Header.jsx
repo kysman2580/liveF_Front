@@ -44,16 +44,13 @@ const Header = () => {
             ) : (
               <RightControls>
                 <CNavItem>
-                  <NavAction onClick={() => setOpenLogInModal(true)}>
-                    LogIn
+                  <NavAction className="primary" onClick={() => setOpenSignUpModal(true)}>
+                    SignUp
                   </NavAction>
                 </CNavItem>
                 <CNavItem>
-                  <NavAction
-                    className="primary"
-                    onClick={() => setOpenSignUpModal(true)}
-                  >
-                    SignUp
+                  <NavAction onClick={() => setOpenLogInModal(true)}>
+                    LogIn
                   </NavAction>
                 </CNavItem>
               </RightControls>

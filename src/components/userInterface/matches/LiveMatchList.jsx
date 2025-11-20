@@ -15,22 +15,34 @@ const PAGE_SIZE = 6;
 const USE_MOCK = false;
 
 const getMatchDay = (dateStr, timeStr) => {
-    if (!dateStr || !timeStr) return dateStr;
-
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const [hour] = timeStr.split(":").map(Number);
-
-    // 새벽 0시 ~ 5시 59분 경기는 전날로 분류
-    if (hour < 6) {
-        const date = new Date(year, month - 1, day);
-        date.setDate(date.getDate() - 1);
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, "0");
-        const d = String(date.getDate()).padStart(2, "0");
-        return `${y}-${m}-${d}`;
+    // 🔍 유효성 검사 강화
+    if (!dateStr || dateStr === 'null' || dateStr === 'undefined') {
+        return null; // 또는 "날짜미정"
     }
 
-    return dateStr;
+    if (!timeStr) {
+        return dateStr; // 시간이 없으면 날짜만 반환
+    }
+
+    try {
+        const [year, month, day] = dateStr.split("-").map(Number);
+        const [hour] = timeStr.split(":").map(Number);
+
+        // 새벽 0시 ~ 5시 59분 경기는 전날로 분류
+        if (hour < 6) {
+            const date = new Date(year, month - 1, day);
+            date.setDate(date.getDate() - 1);
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+            return `${y}-${m}-${d}`;
+        }
+
+        return dateStr;
+    } catch (error) {
+        console.error("getMatchDay 오류:", dateStr, timeStr, error);
+        return null;
+    }
 };
 
 const formatDateDisplay = (dateStr) => {
@@ -130,10 +142,39 @@ const LiveMatchList = () => {
                 .then((res) => {
                     let fetchedData = Array.isArray(res.data) ? res.data : [];
 
-                    fetchedData = fetchedData.map((match) => ({
-                        ...match,
-                        matchDay: getMatchDay(match.date, match.time),
-                    }));
+                    fetchedData = fetchedData.map((match) => {
+                        console.log(fetchedData);
+                        // kickoffTime 변환
+                        let matchDate = null;
+                        let matchTime = null;
+
+                        if (match.kickoffTime && Array.isArray(match.kickoffTime)) {
+                            const [year, month, day, hour, minute] = match.kickoffTime;
+                            matchDate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                            matchTime = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+                        }
+
+                        // 🔥 score 파싱 ("5 - 1" → homeScore: 5, awayScore: 1)
+                        let homeScore = null;
+                        let awayScore = null;
+
+                        if (match.score && typeof match.score === 'string') {
+                            const scores = match.score.split('-').map(s => s.trim());
+                            if (scores.length === 2) {
+                                homeScore = parseInt(scores[0]) || null;
+                                awayScore = parseInt(scores[1]) || null;
+                            }
+                        }
+
+                        return {
+                            ...match,
+                            date: matchDate,
+                            time: matchTime,
+                            matchDay: getMatchDay(matchDate, matchTime),
+                            homeScore,
+                            awayScore,
+                        };
+                    });
 
                     fetchedData = fetchedData.sort(sortMatchesByDateAsc);
 
@@ -172,20 +213,29 @@ const LiveMatchList = () => {
 
         const grouped = {};
         matches.forEach((match) => {
-            const matchDay = match.matchDay || match.date;
+            const matchDay = match.matchDay || match.date || "날짜미정";
+
             if (!grouped[matchDay]) {
                 grouped[matchDay] = [];
             }
             grouped[matchDay].push(match);
         });
+
         return grouped;
     };
 
 
     const formatDateHeader = (dateStr) => {
-        if (!dateStr) return "";
-        const [year, month, day] = dateStr.split("-");
-        return `${month}/${day}`;
+        if (!dateStr || dateStr === 'undefined') return "날짜 미정";
+
+        try {
+            const [year, month, day] = dateStr.split("-");
+            if (!month || !day) return "날짜 미정";
+            return `${month}/${day}`;
+        } catch (error) {
+            console.error("날짜 포맷 오류:", dateStr, error);
+            return "날짜 미정";
+        }
     };
 
     const handleCardClick = (match) => setModalMatch(match);
@@ -252,6 +302,7 @@ const LiveMatchList = () => {
                                                 </div>
                                                 <div className="lmc-main">
                                                     <div className="lmc-team-row">
+                                                        {/* 홈 팀 블록 */}
                                                         <div className="lmc-team-block">
                                                             <div className="lmc-team-logo-inner">
                                                                 {match.homeTeamLogoUrl && (
@@ -260,8 +311,7 @@ const LiveMatchList = () => {
                                                                             match.homeTeamLogoUrl ||
                                                                             "/placeholder.svg"
                                                                         }
-                                                                        alt={`${match.homeTeamName || "Unknown"
-                                                                            } 로고`}
+                                                                        alt={`${match.homeTeamName || "Unknown"} 로고`}
                                                                         style={{
                                                                             width: "100%",
                                                                             height: "100%",
@@ -278,10 +328,9 @@ const LiveMatchList = () => {
                                                                 <div className="lmc-team-type">홈</div>
                                                             </div>
                                                         </div>
+                                                        {/* 🌟 수정된 부분: match.homeScore 사용 */}
                                                         <div className="lmc-score">
-                                                            {match.score
-                                                                ? match.score.split(" - ")[0] || "-"
-                                                                : "-"}
+                                                            {match.homeScore !== null ? match.homeScore : "-"}
                                                         </div>
                                                     </div>
                                                     <div className="lmc-vs-row">
@@ -290,6 +339,7 @@ const LiveMatchList = () => {
                                                         <div className="lmc-vs-line"></div>
                                                     </div>
                                                     <div className="lmc-team-row">
+                                                        {/* 원정 팀 블록 */}
                                                         <div className="lmc-team-block">
                                                             <div className="lmc-team-logo-inner">
                                                                 {match.awayTeamLogoUrl && (
@@ -298,8 +348,7 @@ const LiveMatchList = () => {
                                                                             match.awayTeamLogoUrl ||
                                                                             "/placeholder.svg"
                                                                         }
-                                                                        alt={`${match.awayTeamName || "Unknown"
-                                                                            } 로고`}
+                                                                        alt={`${match.awayTeamName || "Unknown"} 로고`}
                                                                         style={{
                                                                             width: "100%",
                                                                             height: "100%",
@@ -316,17 +365,16 @@ const LiveMatchList = () => {
                                                                 <div className="lmc-team-type">어웨이</div>
                                                             </div>
                                                         </div>
+                                                        {/* 🌟 수정된 부분: match.awayScore 사용 */}
                                                         <div className="lmc-score">
-                                                            {match.score
-                                                                ? match.score.split(" - ")[1] || "-"
-                                                                : "-"}
+                                                            {match.awayScore !== null ? match.awayScore : "-"}
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="lmc-stadium-row">
-                                                    <span className="lmc-stadium-name">
-                                                        {match.venue || "-"}
-                                                    </span>
+                                                    <div className="lmc-stadium-row">
+                                                        <span className="lmc-stadium-name">
+                                                            {match.venue || "-"}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
