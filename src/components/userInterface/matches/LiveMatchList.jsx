@@ -143,7 +143,6 @@ const LiveMatchList = () => {
                     let fetchedData = Array.isArray(res.data) ? res.data : [];
 
                     fetchedData = fetchedData.map((match) => {
-                        console.log(fetchedData);
                         // kickoffTime 변환
                         let matchDate = null;
                         let matchTime = null;
