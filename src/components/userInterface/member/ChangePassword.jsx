@@ -27,7 +27,7 @@ const FindPassword = () => {
     }
 
     axios
-      .get("http://localhost:8080/api/member/check-id", {
+      .get("/api/member/check-id", {
         params: { memberId },
       })
       .then((res) => {
@@ -65,7 +65,7 @@ const FindPassword = () => {
     }
 
     axios
-      .post("http://localhost:8080/api/member/change-password", {
+      .post("/api/member/change-password", {
         memberId: memberId,
         memberPw: newPw,
       })
