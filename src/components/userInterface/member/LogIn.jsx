@@ -26,7 +26,7 @@ const LogIn = ({ setOpenLogInModal }) => {
   const loginHandler = () => {
     axios
       .post(
-        "http://localhost:8080/api/auth/login",
+        "/api/auth/login",
         {
           memberId: id,
           memberPw: password,
@@ -50,7 +50,7 @@ const LogIn = ({ setOpenLogInModal }) => {
 
   const kakaoLoginHandler = () => {
     axios
-      .get("http://localhost:8080/api/auth/kakao/url")
+      .get("/api/auth/kakao/url")
       .then((res) => {
         console.log(res.data.data);
         const kakaoUrl = res.data.data.loginUrl;

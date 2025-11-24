@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     axios
-      .delete(`http://localhost:8080/api/auth/logout`, {
+      .delete(`/api/auth/logout`, {
         withCredentials: true,
       })
       .then(() => {
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
 
   const deleteAccount = () => {
     axios
-      .delete(`http://localhost:8080/api/member/delete`, {
+      .delete(`/api/member/delete`, {
         withCredentials: true,
       })
       .finally(() => {

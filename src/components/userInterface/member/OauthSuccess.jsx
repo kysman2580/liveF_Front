@@ -9,7 +9,7 @@ const OauthSuccess = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/member/myInfo", { withCredentials: true })
+      .get("/api/member/myInfo", { withCredentials: true })
       .then((res) => {
         console.log("카카오 로그인 사용자:", res.data);
         login(res.data.data.member); // 전역 상태에 로그인 정보 저장
