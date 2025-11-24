@@ -4,12 +4,14 @@
   flex-direction: column;
   min-height: 90vh;
   color: #0f172a;
-  background-color: transparent; /* blend with page background */
+  background-color: transparent;
   box-shadow: none;
   position: fixed;
   box-sizing: border-box;
-  font-family: Inter, "Noto Sans KR", system-ui, -apple-system, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial;
+  font-family: Inter, "Noto Sans KR", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  right: 0px;
+  padding: 12px;
+  border: 0.5px solid #e2e2e2;
 }
 
 .chat-header {
