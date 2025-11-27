@@ -8,6 +8,28 @@ import "./LiveChatBox.css";
 
 const MAX_MESSAGES = 100;
 
+// 💡 헬퍼 함수: window.URL_CONFIG에서 CHAT_URL을 안전하게 가져옵니다. (WebSocket용)
+const getChatBaseUrl = () => {
+  if (window.URL_CONFIG?.CHAT_URL) {
+    return window.URL_CONFIG.CHAT_URL;
+  }
+  console.warn("URL_CONFIG.CHAT_URL이 정의되지 않았습니다. 기본 경로 '/chat'을 사용합니다.");
+  return "/chat";
+};
+
+// 💡 헬퍼 함수: window.URL_CONFIG에서 API_URL을 안전하게 가져옵니다. (REST API용)
+const getApiBaseUrl = () => {
+  if (window.URL_CONFIG?.API_URL) {
+    return window.URL_CONFIG.API_URL;
+  }
+  console.warn("URL_CONFIG.API_URL이 정의되지 않았습니다. 기본 경로 '/api'를 사용합니다.");
+  return "/api";
+};
+
+// API_URL을 상수로 정의 (일반 REST API 호출에 사용)
+const API_URL = URL_CONFIG.API_URL;
+
+
 const LiveChatBox = ({ leagueId = 39 }) => {
   const { auth } = useAuth();
   const [input, setInput] = useState("");
@@ -92,10 +114,12 @@ const LiveChatBox = ({ leagueId = 39 }) => {
     };
   }, [leagueId, currentUser, isLoggedIn]);
 
-  // LiveChatBox.jsx - connectWebSocket 함수 부분만 수정
+  // LiveChatBox.jsx - connectWebSocket 함수 수정
   const connectWebSocket = () => {
     try {
-      const wsUrl = "http://localhost:8080/ws";
+      // 💡 CHAT_URL 기반의 getChatBaseUrl()을 사용합니다.
+      // Nginx의 /chat/ 프록시 규칙을 사용하도록 설정
+      const wsUrl = `${API_URL}/ws`;
       console.log(`연결 시도: ${wsUrl}`);
 
       // 💡 CSRF 토큰 관련 로직 제거
@@ -153,6 +177,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
                     {
                       hour: "2-digit",
                       minute: "2-digit",
+                      day: undefined, // Fix for timestamp display
                     }
                   ),
                   type: data.type.toLowerCase(),
@@ -180,8 +205,6 @@ const LiveChatBox = ({ leagueId = 39 }) => {
         },
         (error) => {
           console.error("❌ STOMP 연결 실패:", error);
-          console.error("Error Frame:", error);
-
           const errorMsg =
             error?.headers?.message || error?.body || "Unknown error";
           setConnected(false);
