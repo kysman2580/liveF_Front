@@ -38,7 +38,21 @@ const FindPassword = () => {
         }
       })
       .catch((error) => {
-        alert(error.response.data.message);
+        console.error("❌ 아이디 확인 에러:", error);
+        const responseData = error.response?.data;
+
+        const getValidationMessage = (data) => {
+          if (!data) return null;
+          if (typeof data === "string") return data;
+          const errorList = data.errors || data.data?.errors;
+          if (Array.isArray(errorList) && errorList.length > 0) {
+            return errorList[0].defaultMessage || errorList[0].message;
+          }
+          return data.message || data.data?.message || data.error || data.errorMessage;
+        };
+
+        const errorMsg = getValidationMessage(responseData);
+        alert(errorMsg || "아이디 확인 중 오류가 발생했습니다.");
         setIsMemberValid(false);
       });
   };
@@ -73,8 +87,22 @@ const FindPassword = () => {
         alert("비밀번호가 성공적으로 변경되었습니다.");
         window.location.href = "/";
       })
-      .catch(() => {
-        alert("비밀번호 변경 중 오류가 발생했습니다.");
+      .catch((error) => {
+        console.error("❌ 비밀번호 변경 에러:", error);
+        const responseData = error.response?.data;
+
+        const getValidationMessage = (data) => {
+          if (!data) return null;
+          if (typeof data === "string") return data;
+          const errorList = data.errors || data.data?.errors;
+          if (Array.isArray(errorList) && errorList.length > 0) {
+            return errorList[0].defaultMessage || errorList[0].message;
+          }
+          return data.message || data.data?.message || data.error || data.errorMessage;
+        };
+
+        const errorMsg = getValidationMessage(responseData);
+        alert(errorMsg || "비밀번호 변경 중 오류가 발생했습니다.");
       });
   };
 

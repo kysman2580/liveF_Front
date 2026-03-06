@@ -11,6 +11,7 @@ import CIcon from "@coreui/icons-react";
 import { cilPuzzle, cilCalendar } from "@coreui/icons";
 import { Image, Item } from "./Sidebar.styles";
 import { useNavigate, useLocation } from "react-router-dom";
+import LeagueStandings from "../../components/userInterface/matches/LeagueStandings";
 
 const LEAGUE_IDS = {
   PL: 39,
@@ -18,7 +19,7 @@ const LEAGUE_IDS = {
   BUNDESLIGA: 78,
   SERIEA: 135,
   LIGUE1: 61,
-  FRIENDLIES: 10, // 친선 경기
+  UCL: 2, // 챔피언스 리그
 };
 
 const Sidebar = () => {
@@ -78,11 +79,16 @@ const Sidebar = () => {
           <Image src="/league icons/league 1.png" alt="" /> Ligue 1
         </Item>
 
-        <Item className={isActive(LEAGUE_IDS.FRIENDLIES) ? 'active' : ''}
-          onClick={() => navigateToLeague(LEAGUE_IDS.FRIENDLIES)}>
-          <CIcon customClassName="nav-icon" icon={cilCalendar} style={{ marginRight: '8px', height: '40px', marginLeft: '13px' }} />
-          친선 경기
+        <Item className={isActive(LEAGUE_IDS.UCL) ? 'active' : ''}
+          onClick={() => navigateToLeague(LEAGUE_IDS.UCL)}>
+          <Image src="/league icons/champions.png" alt="" />
+          챔피언스 리그
         </Item>
+
+        <div className="sidebar-standings-section" style={{ padding: '0 10px', marginTop: '20px' }}>
+          <CNavTitle style={{ marginBottom: '10px' }}>리그 순위표</CNavTitle>
+          <LeagueStandings leagueId={selectedLeagueId || 39} variant="sidebar" />
+        </div>
       </CSidebarNav >
       <CSidebarHeader className="border-top border-bottom">
         <CSidebarToggler />

@@ -69,46 +69,27 @@ button.category-btn:hover {
 /* 아이콘 배경 및 정렬 */
 .LeagueNameWrap {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  background: transparent; /* 카드 흰색 제거 */
-  padding: 30px 50px; /* 패딩 축소로 여백 간결화 */
-  border-radius: 8px;
-  width: fit-content;
-}
-
-.TvIconWrap {
-  background: var(--primary);
-  border-radius: 12px;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
-}
-
-.LiveTvIcon {
-  color: #fff;
-  width: 32px;
-  height: 32px;
-  font-size: 32px;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent;
+  padding: 40px 0 20px;
+  border-radius: 0;
+  width: 100%;
 }
 
 .LeagueName {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--primary);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0f172a;
   margin: 0;
-  height: 50px;
+  letter-spacing: -0.02em;
 }
 
 .explain {
-  font-size: 15px;
-  color: #4b5563;
+  font-size: 1rem;
+  color: #64748b;
   margin: 0;
-  margin-top: 7px;
+  font-weight: 500;
 }
 
 /* ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ */

@@ -15,7 +15,8 @@ const LeagueTeamList = ({ leagueName }) => {
         'La Liga': 140,
         'Ligue 1': 61,
         'Serie A': 135,
-        'Bundesliga': 78
+        'Bundesliga': 78,
+        'Champions League': 2
     };
 
     useEffect(() => {

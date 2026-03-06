@@ -1,34 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import SockJS from "sockjs-client";
-import { Stomp } from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";
 import { useAuth } from "../../../provider/AuthProvider";
 import LogIn from "../member/LogIn";
 import "./LiveChatBox.css";
 
-
 const MAX_MESSAGES = 100;
-
-// 💡 헬퍼 함수: window.URL_CONFIG에서 CHAT_URL을 안전하게 가져옵니다. (WebSocket용)
-const getChatBaseUrl = () => {
-  if (window.URL_CONFIG?.CHAT_URL) {
-    return window.URL_CONFIG.CHAT_URL;
-  }
-  console.warn("URL_CONFIG.CHAT_URL이 정의되지 않았습니다. 기본 경로 '/chat'을 사용합니다.");
-  return "/chat";
-};
-
-// 💡 헬퍼 함수: window.URL_CONFIG에서 API_URL을 안전하게 가져옵니다. (REST API용)
-const getApiBaseUrl = () => {
-  if (window.URL_CONFIG?.API_URL) {
-    return window.URL_CONFIG.API_URL;
-  }
-  console.warn("URL_CONFIG.API_URL이 정의되지 않았습니다. 기본 경로 '/api'를 사용합니다.");
-  return "/api";
-};
-
-// API_URL을 상수로 정의 (일반 REST API 호출에 사용)
-const API_URL = URL_CONFIG.API_URL;
-
+const API_URL = import.meta.env.VITE_API_BASE_URL || window.URL_CONFIG?.API_URL || "";
 
 const LiveChatBox = ({ leagueId = 39 }) => {
   const { auth } = useAuth();
@@ -37,14 +15,18 @@ const LiveChatBox = ({ leagueId = 39 }) => {
   const [connected, setConnected] = useState(false);
   const [openLogInModal, setOpenLogInModal] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(true);
 
-  const stompClient = useRef(null);
+  const stompClientRef = useRef(null);
   const subscriptionRef = useRef(null);
   const messagesEndRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+  const isConnectingRef = useRef(false);
+  const currentLeagueIdRef = useRef(leagueId);
+  const isDisconnectingRef = useRef(false); // 🔍 LEAVE 메시지 중복 방지
 
   const isLoggedIn = auth.isAuthenticated;
-  const currentUser = auth.memberInfo?.memberNickname || "익명";
+  const currentUser = auth.memberInfo?.memberNickname || auth.memberInfo?.username || "익명";
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,6 +36,174 @@ const LiveChatBox = ({ leagueId = 39 }) => {
     scrollToBottom();
   }, [messages]);
 
+  // 구독 해제 함수
+  const unsubscribeFromLeague = (leagueIdToUnsubscribe) => {
+    if (subscriptionRef.current) {
+      try {
+        console.log(`🔌 리그 ${leagueIdToUnsubscribe} 구독 해제 중...`);
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+        console.log(`✅ 리그 ${leagueIdToUnsubscribe} 구독 해제 완료`);
+      } catch (e) {
+        console.error("구독 해제 오류:", e);
+        subscriptionRef.current = null;
+      }
+    }
+  };
+
+  // 연결 정리 함수
+  const disconnectWebSocket = async (currentLeagueId, skipLeaveMessage = false) => {
+    // 🔍 이미 LEAVE 메시지를 보낸 경우 중복 방지
+    if (isDisconnectingRef.current) {
+      console.log(`⚠️ 이미 연결 해제 중입니다. 중복 실행 방지`);
+      return Promise.resolve();
+    }
+
+    isDisconnectingRef.current = true; // 🔍 플래그 설정
+    console.log(`🔌 리그 ${currentLeagueId} WebSocket 연결 정리 시작...`);
+
+    // 1. reconnect 타이머 정리
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+
+    // 2. STOMP 연결 해제
+    if (stompClientRef.current?.active) {
+      const client = stompClientRef.current;
+
+      try {
+        // 🔍 LEAVE 메시지는 skipLeaveMessage가 false일 때만 전송
+        if (!skipLeaveMessage) {
+          console.log(`📤 LEAVE 메시지 전송: leagueId=${currentLeagueId}`);
+          client.publish({
+            destination: "/app/chat/leave",
+            body: JSON.stringify({
+              type: "LEAVE",
+              leagueId: currentLeagueId,
+              sender: currentUser,
+            }),
+          });
+        }
+
+        unsubscribeFromLeague(currentLeagueId);
+
+        // deactivate()는 비동기 작업이며 소켓을 안전하게 닫습니다.
+        return client.deactivate().then(() => {
+          console.log(`✅ 리그 ${currentLeagueId} STOMP 연결 해제 완료`);
+          stompClientRef.current = null;
+          isDisconnectingRef.current = false;
+        });
+      } catch (e) {
+        console.error("연결 해제 오류:", e);
+        unsubscribeFromLeague(currentLeagueId);
+        stompClientRef.current = null;
+        isDisconnectingRef.current = false;
+        return Promise.resolve();
+      }
+    }
+
+    // 연결이 없는 경우에도 구독 해제
+    unsubscribeFromLeague(currentLeagueId);
+    stompClientRef.current = null;
+    isDisconnectingRef.current = false;
+    return Promise.resolve();
+  };
+
+  // WebSocket 연결 함수
+  const connectWebSocket = () => {
+    if (isConnectingRef.current) {
+      console.log("⚠️ 이미 연결 중입니다. 중복 연결 방지");
+      return;
+    }
+
+    isConnectingRef.current = true;
+    console.log(`🚀 리그 ${leagueId} 채팅 연결 시작... (사용자: ${currentUser})`);
+
+    try {
+      const wsUrl = `${API_URL}/ws`;
+
+      const client = new Client({
+        webSocketFactory: () => new SockJS(wsUrl),
+        connectHeaders: {
+          "X-Username": currentUser,
+        },
+        heartbeatIncoming: 10000,
+        heartbeatOutgoing: 10000,
+        debug: (str) => {
+          // console.log(str); // 필요한 경우 디버깅 로그 활성화
+        },
+        onConnect: (frame) => {
+          console.log(`✅ STOMP 연결 성공! (리그 ${leagueId})`);
+          setConnected(true);
+          setConnectionError(null);
+          stompClientRef.current = client;
+          isConnectingRef.current = false;
+          isDisconnectingRef.current = false;
+          currentLeagueIdRef.current = leagueId;
+
+          const destination = `/topic/league-${leagueId}`;
+          console.log(`📡 구독 시작: ${destination}`);
+
+          // 구독 시작
+          const subscription = client.subscribe(destination, (msg) => {
+            try {
+              const data = JSON.parse(msg.body);
+              if (data.leagueId !== currentLeagueIdRef.current) return;
+
+              setMessages((prev) => {
+                const newMsg = {
+                  id: Date.now() + Math.random(),
+                  user: data.sender,
+                  message: data.message,
+                  timestamp: new Date(data.timestamp).toLocaleTimeString("ko-KR", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }),
+                  type: data.type.toLowerCase(),
+                };
+                const updated = [...prev, newMsg];
+                return updated.length > MAX_MESSAGES ? updated.slice(-MAX_MESSAGES) : updated;
+              });
+            } catch (e) {
+              console.error("❌ 메시지 파싱 실패:", e);
+            }
+          });
+
+          subscriptionRef.current = subscription;
+
+          // 입장 메시지 전송 (publish 사용)
+          client.publish({
+            destination: "/app/chat/enter",
+            body: JSON.stringify({
+              type: "ENTER",
+              leagueId,
+              sender: currentUser,
+            }),
+          });
+        },
+        onStompError: (frame) => {
+          console.error("❌ STOMP 에러 발생:", frame.headers["message"]);
+          setConnectionError(`STOMP 에러: ${frame.headers["message"]}`);
+        },
+        onWebSocketClose: () => {
+          console.log("🔌 WebSocket 연결 닫힘");
+          setConnected(false);
+          isConnectingRef.current = false;
+        },
+      });
+
+      client.activate(); // 연결 시작
+      stompClientRef.current = client;
+
+    } catch (error) {
+      console.error("❌ WebSocket 초기화 실패:", error);
+      setConnectionError("초기화 실패: " + error.message);
+      isConnectingRef.current = false;
+    }
+  };
+
+  // leagueId 변경 감지
   useEffect(() => {
     if (!isLoggedIn) {
       console.log("로그인 필요 - WebSocket 연결 생략");
@@ -62,168 +212,44 @@ const LiveChatBox = ({ leagueId = 39 }) => {
       return;
     }
 
-    console.log(`리그 ${leagueId} 채팅 연결 시작... (사용자: ${currentUser})`);
-    console.log("현재 쿠키:", document.cookie);
+    let isMounted = true;
+    const previousLeagueId = currentLeagueIdRef.current;
 
-    // 기존 연결 정리
-    if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-    if (subscriptionRef.current) subscriptionRef.current.unsubscribe();
-    if (stompClient.current?.connected) {
-      try {
-        stompClient.current.send(
-          "/app/chat/leave",
-          {},
-          JSON.stringify({
-            type: "LEAVE",
-            leagueId,
-            sender: currentUser,
-          })
-        );
-        stompClient.current.disconnect();
-      } catch (e) {
-        console.error("disconnect error:", e);
+    const initConnection = async () => {
+      console.log(`\n🔄 리그 변경 감지: ${previousLeagueId} → ${leagueId}`);
+
+      // 🔍 같은 리그로 재연결하는 경우 LEAVE 메시지 스킵
+      const isSameLeague = previousLeagueId === leagueId;
+
+      // 기존 연결 완전 정리
+      await disconnectWebSocket(previousLeagueId, isSameLeague);
+
+      // 상태 초기화
+      setMessages([]);
+      setConnected(false);
+      setConnectionError(null);
+
+      // 서버 정리 시간 제공
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      if (isMounted) {
+        connectWebSocket();
       }
-    }
+    };
 
-    setMessages([]);
-    setConnected(false);
-    setConnectionError(null);
+    initConnection();
 
-    connectWebSocket();
-
-    // useEffect cleanup에서 완전히 정리
     return () => {
-      if (reconnectTimeoutRef.current)
-        clearTimeout(reconnectTimeoutRef.current);
-      if (subscriptionRef.current) subscriptionRef.current.unsubscribe();
-      if (stompClient.current?.connected) {
-        stompClient.current.send(
-          "/app/chat/leave",
-          {},
-          JSON.stringify({
-            type: "LEAVE",
-            leagueId,
-            sender: currentUser,
-          })
-        );
-        stompClient.current.disconnect(() => {
-          console.log("완전히 disconnect 완료");
-        });
-      }
-      stompClient.current = null;
+      console.log(`\n🧹 Cleanup 실행 (리그 ${currentLeagueIdRef.current})`);
+      isMounted = false;
+      isConnectingRef.current = false;
+      const cleanupLeagueId = currentLeagueIdRef.current;
+      disconnectWebSocket(cleanupLeagueId);
     };
   }, [leagueId, currentUser, isLoggedIn]);
 
-  // LiveChatBox.jsx - connectWebSocket 함수 수정
-  const connectWebSocket = () => {
-    try {
-      // 💡 CHAT_URL 기반의 getChatBaseUrl()을 사용합니다.
-      // Nginx의 /chat/ 프록시 규칙을 사용하도록 설정
-      const wsUrl = `${API_URL}/ws`;
-      console.log(`연결 시도: ${wsUrl}`);
-
-      // 💡 CSRF 토큰 관련 로직 제거
-
-      // SockJS 옵션 단순화
-      const socket = new SockJS(wsUrl);
-
-      socket.onopen = () => console.log("✅ SockJS 소켓 열림");
-      socket.onerror = (e) => {
-        console.error("❌ SockJS 에러:", e);
-        setConnectionError("소켓 연결 실패");
-      };
-      socket.onclose = (e) => {
-        console.log("🔌 SockJS 소켓 닫힘:", e.code, e.reason);
-        setConnected(false);
-        if (!e.wasClean && isLoggedIn) {
-          console.log("🔄 3초 후 재연결...");
-          reconnectTimeoutRef.current = setTimeout(connectWebSocket, 3000);
-        }
-      };
-
-      const client = Stomp.over(socket);
-      client.debug = (str) => console.log("STOMP:", str);
-
-      // 💡 CONNECT 헤더 설정 (CSRF 헤더 없음)
-      const connectHeaders = {
-        "X-Username": currentUser,
-        "heart-beat": "10000,10000",
-      };
-
-      console.log("📤 CONNECT 헤더 (CSRF 없음):", connectHeaders);
-
-      client.connect(
-        connectHeaders,
-        (frame) => {
-          console.log("✅ STOMP 연결 성공!", frame);
-          setConnected(true);
-          setConnectionError(null);
-          stompClient.current = client;
-
-          const destination = `/topic/league-${leagueId}`;
-          console.log(`📡 구독: ${destination}`);
-
-          subscriptionRef.current = client.subscribe(destination, (msg) => {
-            try {
-              const data = JSON.parse(msg.body);
-              console.log("📩 메시지 수신:", data);
-              setMessages((prev) => {
-                const newMsg = {
-                  id: Date.now() + Math.random(),
-                  user: data.sender,
-                  message: data.message,
-                  timestamp: new Date(data.timestamp).toLocaleTimeString(
-                    "ko-KR",
-                    {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      day: undefined, // Fix for timestamp display
-                    }
-                  ),
-                  type: data.type.toLowerCase(),
-                };
-                const updated = [...prev, newMsg];
-                return updated.length > MAX_MESSAGES
-                  ? updated.slice(-MAX_MESSAGES)
-                  : updated;
-              });
-            } catch (e) {
-              console.error("❌ 메시지 파싱 실패:", e);
-            }
-          });
-
-          // 입장 메시지 전송
-          client.send(
-            "/app/chat/enter",
-            {},
-            JSON.stringify({
-              type: "ENTER",
-              leagueId,
-              sender: currentUser,
-            })
-          );
-        },
-        (error) => {
-          console.error("❌ STOMP 연결 실패:", error);
-          const errorMsg =
-            error?.headers?.message || error?.body || "Unknown error";
-          setConnected(false);
-          setConnectionError(`연결 실패: ${errorMsg}`);
-
-          // 5초 후 재연결
-          if (isLoggedIn) {
-            reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
-          }
-        }
-      );
-    } catch (error) {
-      console.error("❌ WebSocket 초기화 실패:", error);
-      setConnectionError("초기화 실패: " + error.message);
-    }
-  };
-
   const handleSend = () => {
-    if (!connected || !input.trim() || !stompClient.current) return;
+    if (!connected || !input.trim() || !stompClientRef.current) return;
 
     const message = {
       type: "TALK",
@@ -231,7 +257,12 @@ const LiveChatBox = ({ leagueId = 39 }) => {
       sender: currentUser,
       message: input.trim(),
     };
-    stompClient.current.send("/app/chat/send", {}, JSON.stringify(message));
+
+    console.log("📤 메시지 전송:", message);
+    stompClientRef.current.publish({
+      destination: "/app/chat/send",
+      body: JSON.stringify(message),
+    });
     setInput("");
   };
 
@@ -251,6 +282,7 @@ const LiveChatBox = ({ leagueId = 39 }) => {
       135: "세리에A",
       78: "분데스리가",
       61: "리그1",
+      2: "챔피언스 리그",
     };
     return names[id] || `리그 ${id}`;
   };
@@ -258,95 +290,122 @@ const LiveChatBox = ({ leagueId = 39 }) => {
   return (
     <>
       <div className="chat-box-wrap">
-        <div className="live-chat-box">
-          <div className="chat-header">
-            <span className="chat-title">
-              실시간 채팅
-              {isLoggedIn && connected && (
-                <span className="status-indicator">ON</span>
-              )}
-              {isLoggedIn && !connected && (
-                <span className="status-indicator">OFF</span>
-              )}
-            </span>
-            <span className="chat-match">
-              {getLeagueName(leagueId)}{" "}
-              {isLoggedIn && `(${messages.length}/${MAX_MESSAGES})`}
-            </span>
-          </div>
+        <div className={`chat-container ${isChatOpen ? 'is-open' : 'is-closed'}`}>
+          <div className="live-chat-box">
+            <div className="chat-header">
+              <div className="chat-title">
+                <span>실시간 채팅</span>
+                {isLoggedIn && (
+                  <span className={`status-indicator ${connected ? "ON" : "OFF"}`}>
+                    {connected ? "LIVE" : "OFFLINE"}
+                  </span>
+                )}
+              </div>
+              <div className="chat-match">
+                {getLeagueName(leagueId)}
+              </div>
+            </div>
 
-          <div className="chat-messages">
-            {!isLoggedIn ? (
-              <div className="chat-login-required">
-                <div className="login-icon">Chat</div>
-                <p className="login-message">
-                  채팅 참여를 위해 로그인이 필요합니다
-                </p>
-                <button className="chat-login-btn" onClick={handleLoginClick}>
-                  로그인하기
+            <div className="chat-messages">
+              {!isLoggedIn ? (
+                <div className="chat-login-required">
+                  <div className="login-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                  </div>
+                  <p className="login-message">
+                    채팅 참여를 위해 로그인이 필요합니다
+                  </p>
+                  <button className="chat-login-btn" onClick={handleLoginClick}>
+                    로그인하기
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {connectionError && (
+                    <div className="chat-notice" style={{ color: "#ef4444" }}>
+                      {connectionError}
+                    </div>
+                  )}
+                  {!connected && messages.length === 0 && !connectionError && (
+                    <div className="chat-notice">연결을 시도 중입니다...</div>
+                  )}
+                  {messages.map((msg) => {
+                    const isMe = msg.user === currentUser;
+                    return (
+                      <div key={msg.id} className={`chat-msg chat-msg-${msg.type} ${isMe ? 'is-me' : ''}`}>
+                        {msg.type === "talk" ? (
+                          <>
+                            {!isMe && <span className="chat-user">{msg.user}</span>}
+                            <div className="chat-text-wrapper">
+                              <div className="chat-text">{msg.message}</div>
+                              <span className="chat-time">{msg.timestamp}</span>
+                            </div>
+                          </>
+                        ) : (
+                          <span className="chat-system-message">{msg.message}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
+            </div>
+
+            {isLoggedIn && (
+              <div className="chat-input-row">
+                <input
+                  className="chat-input"
+                  type="text"
+                  placeholder={connected ? "메시지를 입력하세요..." : "연결 대기 중..."}
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyPress}
+                  autoComplete="off"
+                  disabled={!connected}
+                />
+                <button
+                  className="chat-send-btn"
+                  onClick={handleSend}
+                  disabled={!connected || !input.trim()}
+                  title="보내기"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
                 </button>
               </div>
-            ) : (
-              <>
-                {connectionError && (
-                  <div
-                    className="chat-notice"
-                    style={{ color: "red", padding: "10px" }}
-                  >
-                    {connectionError}
-                  </div>
-                )}
-                {!connected && messages.length === 0 && !connectionError && (
-                  <div className="chat-notice">연결 중...</div>
-                )}
-                {messages.map((msg) => (
-                  <div key={msg.id} className={`chat-msg chat-msg-${msg.type}`}>
-                    {msg.type === "talk" && (
-                      <>
-                        <span className="chat-user">{msg.user}</span>
-                        <span className="chat-text">{msg.message}</span>
-                        <span className="chat-time">{msg.timestamp}</span>
-                      </>
-                    )}
-                    {(msg.type === "enter" || msg.type === "leave") && (
-                      <span className="chat-system-message">{msg.message}</span>
-                    )}
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </>
             )}
           </div>
 
-          {isLoggedIn && (
-            <div className="chat-input-row">
-              <input
-                className="chat-input"
-                type="text"
-                placeholder={connected ? "메시지 입력..." : "연결 중..."}
-                value={input}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                autoComplete="off"
-                disabled={!connected}
-              />
-              <button
-                className="chat-send-btn"
-                onClick={handleSend}
-                disabled={!connected || !input.trim()}
-              >
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M3 20L21 12L3 4V10L15 12L3 14V20Z" fill="white" />
-                </svg>
-              </button>
-            </div>
-          )}
+          <button
+            className="chat-toggle-btn"
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            title={isChatOpen ? "채팅 닫기" : "채팅 열기"}
+          >
+            {isChatOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 

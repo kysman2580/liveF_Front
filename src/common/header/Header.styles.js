@@ -3,58 +3,67 @@ import styled from "styled-components";
 export const Brand = styled.div`
   font-family: "Montserrat", "Noto Sans KR", Arial, sans-serif;
   font-weight: 900;
-  font-size: 1.35rem;
-  color: var(--primary);
+  font-size: 1.5rem;
+  color: #0f172a;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.1em;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 export const LogoDot = styled.span`
-  width: 10px;
-  height: 10px;
-  background: var(--primary);
+  width: 12px;
+  height: 12px;
+  background: #22c55e; /* 포인트 색상: 축구장의 상큼한 그린 */
   border-radius: 50%;
   display: inline-block;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
 `;
 
 export const NavAction = styled.button`
   background: transparent;
-  border: 1px solid transparent;
-  color: #333;
-  padding: 6px 14px;
-  border-radius: 7px;
-  margin-left: 8px;
+  border: none;
+  color: #64748b;
+  padding: 8px 16px;
+  border-radius: 12px;
+  margin-left: 4px;
   font-family: "Montserrat", "Noto Sans KR", Arial, sans-serif;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: var(--primary-weak);
-    color: var(--primary);
-    transform: translateY(-1px) scale(1.04);
+    background: #f1f5f9;
+    color: #0f172a;
   }
 
   &.primary {
-    background: var(--primary);
+    background: #0f172a;
     color: #fff;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 7px;
-    font-size: 0.95rem;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
+    padding: 8px 20px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+  }
+
+  &.primary:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
   }
 `;
 
 export const RightControls = styled.div`
   display: flex;
   align-items: center;
+  gap: 4px;
 `;
 

@@ -10,7 +10,7 @@ const LEAGUE_MAP = {
   78: { displayName: "Bundesliga", listName: "Bundesliga" },
   135: { displayName: "Serie A", listName: "Serie A" },
   61: { displayName: "Ligue 1", listName: "Ligue 1" },
-  10: { displayName: "친선 경기", listName: "FRIENDLIES" },
+  2: { displayName: "Champions League", listName: "Champions League" },
 };
 
 const LiveMatch = () => {
@@ -23,19 +23,18 @@ const LiveMatch = () => {
   return (
     <>
       <div className="LeagueNameWrap">
-        <div>
-          <h2 className="LeagueName" style={{ color: "black" }}>
-            {leagueInfo.displayName}
-          </h2>
-          <h2 className="explain">실시간 경기 정보를 확인하세요</h2>
-        </div>
+        <h2 className="LeagueName">
+          {leagueInfo.displayName}
+        </h2>
+        <p className="explain">실시간 경기 정보를 확인하세요</p>
       </div>
 
       <LiveMatchList />
 
+      {/* 팀 리스트 복원 */}
       <div className="LeagueTeam">
         <div className="LeagueTeamTitle">
-          {leagueInfo.displayName} 팀 리스트
+          {leagueInfo.displayName} 팀 목록
         </div>
         <LeagueTeamList leagueName={leagueInfo.listName} />
       </div>

@@ -160,8 +160,10 @@ const LiveMatchList = () => {
                         if (match.score && typeof match.score === 'string') {
                             const scores = match.score.split('-').map(s => s.trim());
                             if (scores.length === 2) {
-                                homeScore = parseInt(scores[0]) || null;
-                                awayScore = parseInt(scores[1]) || null;
+                                const parsedHome = parseInt(scores[0]);
+                                const parsedAway = parseInt(scores[1]);
+                                homeScore = isNaN(parsedHome) ? null : parsedHome;
+                                awayScore = isNaN(parsedAway) ? null : parsedAway;
                             }
                         }
 
@@ -237,11 +239,35 @@ const LiveMatchList = () => {
         }
     };
 
+    const [selectedDate, setSelectedDate] = useState(getTodayMatchDay());
+
     const handleCardClick = (match) => setModalMatch(match);
     const handleCloseModal = () => setModalMatch(null);
 
+    const getDatesToDisplay = () => {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const formatDate = (date) => {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+            return `${y}-${m}-${d}`;
+        };
+
+        return [
+            { id: formatDate(yesterday), label: "어제", date: formatDate(yesterday) },
+            { id: formatDate(today), label: "오늘", date: formatDate(today) },
+            { id: formatDate(tomorrow), label: "내일", date: formatDate(tomorrow) },
+        ];
+    };
+
+    const dateTabs = getDatesToDisplay();
     const groupedMatches = getGroupedMatches();
-    const sortedDates = Object.keys(groupedMatches).sort();
+    const displayedMatches = groupedMatches[selectedDate] || [];
 
     return (
         <div
@@ -253,6 +279,23 @@ const LiveMatchList = () => {
             }}
         >
             <div style={{ flex: 1 }}>
+                {/* 날짜 내비게이션 */}
+                <div className="date-navigation">
+                    {dateTabs.map((tab) => (
+                        <div
+                            key={tab.id}
+                            className={`date-tab ${selectedDate === tab.date ? "active" : ""}`}
+                            onClick={() => setSelectedDate(tab.date)}
+                        >
+                            {groupedMatches[tab.date]?.length > 0 && (
+                                <div className="match-indicator-dot" title="경기가 있는 날입니다"></div>
+                            )}
+                            <span className="date-tab-label">{tab.label}</span>
+                            <span className="date-tab-sublabel">{formatDateHeader(tab.date)}</span>
+                        </div>
+                    ))}
+                </div>
+
                 {/* 경기 목록 */}
                 <div className="LiveMatchList">
                     {loading ? (
@@ -261,210 +304,198 @@ const LiveMatchList = () => {
                         <div className="no-matches" style={{ color: "red" }}>
                             {error}
                         </div>
-                    ) : matches.length === 0 ? (
-                        <div className="no-matches">경기 정보가 없습니다.</div>
+                    ) : displayedMatches.length === 0 ? (
+                        <div className="no-matches">선택한 날짜에 예정된 경기가 없습니다.</div>
                     ) : (
                         <>
-                            {sortedDates.map((date) => (
-                                <React.Fragment key={date}>
-                                    {/* 날짜 헤더 */}
-                                    <div className="date-group-header">
-                                        <h3 className="date-group-title">
-                                            {formatDateHeader(date)} 경기
-                                        </h3>
-                                    </div>
-
-                                    {/* 해당 날짜의 경기 카드들 */}
-                                    {groupedMatches[date].map((match) => (
-                                        <div
-                                            className="LiveMatchCard"
-                                            key={match.fixtureId || Math.random()}
-                                            tabIndex={0}
-                                            onClick={() => handleCardClick(match)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") handleCardClick(match);
-                                            }}
-                                            style={{ cursor: "pointer", position: "relative" }}
-                                        >
-                                            <div className="card-gradient" />
-                                            <div className="card-content">
-                                                <div className="lmc-top-row">
-                                                    <span className="lmc-badge">
-                                                        <span className="lmc-badge-dot"></span>
-                                                        {match.status || "NS"}
-                                                    </span>
-                                                    <div className="lmc-time">
-                                                        <span className="font-medium">
-                                                            {match.time || "--"}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="lmc-main">
-                                                    <div className="lmc-team-row">
-                                                        {/* 홈 팀 블록 */}
-                                                        <div className="lmc-team-block">
-                                                            <div className="lmc-team-logo-inner">
-                                                                {match.homeTeamLogoUrl && (
-                                                                    <img
-                                                                        src={
-                                                                            match.homeTeamLogoUrl ||
-                                                                            "/placeholder.svg"
-                                                                        }
-                                                                        alt={`${match.homeTeamName || "Unknown"} 로고`}
-                                                                        style={{
-                                                                            width: "100%",
-                                                                            height: "100%",
-                                                                            objectFit: "contain",
-                                                                            borderRadius: "6px",
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            </div>
-                                                            <div className="lmc-team-info">
-                                                                <div className="lmc-team-name">
-                                                                    {match.homeTeamName || "Unknown"}
-                                                                </div>
-                                                                <div className="lmc-team-type">홈</div>
-                                                            </div>
-                                                        </div>
-                                                        {/* 🌟 수정된 부분: match.homeScore 사용 */}
-                                                        <div className="lmc-score">
-                                                            {match.homeScore !== null ? match.homeScore : "-"}
-                                                        </div>
-                                                    </div>
-                                                    <div className="lmc-vs-row">
-                                                        <div className="lmc-vs-line"></div>
-                                                        <span className="lmc-vs">VS</span>
-                                                        <div className="lmc-vs-line"></div>
-                                                    </div>
-                                                    <div className="lmc-team-row">
-                                                        {/* 원정 팀 블록 */}
-                                                        <div className="lmc-team-block">
-                                                            <div className="lmc-team-logo-inner">
-                                                                {match.awayTeamLogoUrl && (
-                                                                    <img
-                                                                        src={
-                                                                            match.awayTeamLogoUrl ||
-                                                                            "/placeholder.svg"
-                                                                        }
-                                                                        alt={`${match.awayTeamName || "Unknown"} 로고`}
-                                                                        style={{
-                                                                            width: "100%",
-                                                                            height: "100%",
-                                                                            objectFit: "contain",
-                                                                            borderRadius: "6px",
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            </div>
-                                                            <div className="lmc-team-info">
-                                                                <div className="lmc-team-name">
-                                                                    {match.awayTeamName || "Unknown"}
-                                                                </div>
-                                                                <div className="lmc-team-type">어웨이</div>
-                                                            </div>
-                                                        </div>
-                                                        {/* 🌟 수정된 부분: match.awayScore 사용 */}
-                                                        <div className="lmc-score">
-                                                            {match.awayScore !== null ? match.awayScore : "-"}
-                                                        </div>
-                                                    </div>
-                                                    <div className="lmc-stadium-row">
-                                                        <span className="lmc-stadium-name">
-                                                            {match.venue || "-"}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </React.Fragment>
-                            ))}
-
-                            {modalMatch && (
-                                <div className="MatchModalOverlay" onClick={handleCloseModal}>
-                                    <div
-                                        className="MatchModal"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <button
-                                            className="close-modal-btn"
-                                            onClick={handleCloseModal}
-                                        >
-                                            &times;
-                                        </button>
-                                        <h2>{modalMatch.leagueName || "Unknown League"}</h2>
-                                        <div className="modal-teams modal-teams-logos">
-                                            <div className="modal-team-block">
-                                                {modalMatch.homeTeamLogoUrl && (
-                                                    <img
-                                                        src={
-                                                            modalMatch.homeTeamLogoUrl || "/placeholder.svg"
-                                                        }
-                                                        alt={`${modalMatch.homeTeamName || "Unknown"} 로고`}
-                                                        className="modal-team-logo"
-                                                    />
-                                                )}
-                                                <span className="modal-team-ko">
-                                                    {modalMatch.homeTeamName || "Unknown"}
-                                                </span>
-                                            </div>
-                                            <span className="modal-score">
-                                                {modalMatch.score || "0 - 0"}
-                                            </span>
-                                            <div className="modal-team-block">
-                                                {modalMatch.awayTeamLogoUrl && (
-                                                    <img
-                                                        src={
-                                                            modalMatch.awayTeamLogoUrl || "/placeholder.svg"
-                                                        }
-                                                        alt={`${modalMatch.awayTeamName || "Unknown"} 로고`}
-                                                        className="modal-team-logo"
-                                                    />
-                                                )}
-                                                <span className="modal-team-ko">
-                                                    {modalMatch.awayTeamName || "Unknown"}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="modal-info">
-                                            <div>
-                                                <span>경기 상태</span>{" "}
-                                                <b>{modalMatch.status || "NS"}</b>
-                                            </div>
-                                            <div>
-                                                <span>경기장</span> <b>{modalMatch.venue || "-"}</b>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {loginModal && (
+                            {/* 선택된 날짜의 경기 카드들 */}
+                            {displayedMatches.map((match) => (
                                 <div
-                                    className="login-modal-overlay"
-                                    onClick={handleCloseLoginModal}
+                                    className="LiveMatchCard"
+                                    key={match.fixtureId || Math.random()}
+                                    tabIndex={0}
+                                    onClick={() => handleCardClick(match)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleCardClick(match);
+                                    }}
+                                    style={{ cursor: "pointer", position: "relative" }}
                                 >
-                                    <div
-                                        className="login-modal"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <h3>로그인이 필요합니다</h3>
-                                        <button className="chat-login-btn" onClick={handleDoLogin}>
-                                            간편 로그인
-                                        </button>
-                                        <button
-                                            className="chat-login-btn chat-login-cancel"
-                                            onClick={handleCloseLoginModal}
-                                        >
-                                            취소
-                                        </button>
+                                    <div className="card-gradient" />
+                                    <div className="card-content">
+                                        <div className="lmc-top-row">
+                                            <span className={`lmc-badge ${['LIVE', '1H', '2H', 'HT'].includes(match.status) ? 'live' : ''}`}>
+                                                <span className="lmc-badge-dot"></span>
+                                                {match.status || "NS"}
+                                            </span>
+                                            <div className="lmc-time">
+                                                <span className="font-medium">
+                                                    {match.time || "--"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="lmc-main">
+                                            <div className="lmc-team-row">
+                                                {/* 홈 팀 블록 */}
+                                                <div className="lmc-team-block">
+                                                    <div className="lmc-team-logo-inner">
+                                                        {match.homeTeamLogoUrl && (
+                                                            <img
+                                                                src={
+                                                                    match.homeTeamLogoUrl ||
+                                                                    "/placeholder.svg"
+                                                                }
+                                                                alt={`${match.homeTeamName || "Unknown"} 로고`}
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "contain",
+                                                                    borderRadius: "6px",
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div className="lmc-team-info">
+                                                        <div className="lmc-team-name">
+                                                            {match.homeTeamName || "Unknown"}
+                                                        </div>
+                                                        <div className="lmc-team-type">홈</div>
+                                                    </div>
+                                                </div>
+                                                {/* 🌟 수정된 부분: match.homeScore 사용 */}
+                                                <div className="lmc-score">
+                                                    {match.homeScore !== null ? match.homeScore : "-"}
+                                                </div>
+                                            </div>
+                                            <div className="lmc-vs-row">
+                                                <div className="lmc-vs-line"></div>
+                                                <span className="lmc-vs">VS</span>
+                                                <div className="lmc-vs-line"></div>
+                                            </div>
+                                            <div className="lmc-team-row">
+                                                {/* 원정 팀 블록 */}
+                                                <div className="lmc-team-block">
+                                                    <div className="lmc-team-logo-inner">
+                                                        {match.awayTeamLogoUrl && (
+                                                            <img
+                                                                src={
+                                                                    match.awayTeamLogoUrl ||
+                                                                    "/placeholder.svg"
+                                                                }
+                                                                alt={`${match.awayTeamName || "Unknown"} 로고`}
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "contain",
+                                                                    borderRadius: "6px",
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div className="lmc-team-info">
+                                                        <div className="lmc-team-name">
+                                                            {match.awayTeamName || "Unknown"}
+                                                        </div>
+                                                        <div className="lmc-team-type">어웨이</div>
+                                                    </div>
+                                                </div>
+                                                {/* 🌟 수정된 부분: match.awayScore 사용 */}
+                                                <div className="lmc-score">
+                                                    {match.awayScore !== null ? match.awayScore : "-"}
+                                                </div>
+                                            </div>
+                                            <div className="lmc-stadium-row">
+                                                <span className="lmc-stadium-name">
+                                                    {match.venue || "-"}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            )}
+                            ))}
                         </>
                     )}
                 </div>
+                {modalMatch && (
+                    <div className="MatchModalOverlay" onClick={handleCloseModal}>
+                        <div
+                            className="MatchModal"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                className="close-modal-btn"
+                                onClick={handleCloseModal}
+                            >
+                                &times;
+                            </button>
+                            <h2>{modalMatch.leagueName || "Unknown League"}</h2>
+                            <div className="modal-teams modal-teams-logos">
+                                <div className="modal-team-block">
+                                    {modalMatch.homeTeamLogoUrl && (
+                                        <img
+                                            src={
+                                                modalMatch.homeTeamLogoUrl || "/placeholder.svg"
+                                            }
+                                            alt={`${modalMatch.homeTeamName || "Unknown"} 로고`}
+                                            className="modal-team-logo"
+                                        />
+                                    )}
+                                    <span className="modal-team-ko">
+                                        {modalMatch.homeTeamName || "Unknown"}
+                                    </span>
+                                </div>
+                                <span className="modal-score">
+                                    {modalMatch.score || "0 - 0"}
+                                </span>
+                                <div className="modal-team-block">
+                                    {modalMatch.awayTeamLogoUrl && (
+                                        <img
+                                            src={
+                                                modalMatch.awayTeamLogoUrl || "/placeholder.svg"
+                                            }
+                                            alt={`${modalMatch.awayTeamName || "Unknown"} 로고`}
+                                            className="modal-team-logo"
+                                        />
+                                    )}
+                                    <span className="modal-team-ko">
+                                        {modalMatch.awayTeamName || "Unknown"}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="modal-info">
+                                <div>
+                                    <span>경기 상태</span>{" "}
+                                    <b>{modalMatch.status || "NS"}</b>
+                                </div>
+                                <div>
+                                    <span>경기장</span> <b>{modalMatch.venue || "-"}</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {loginModal && (
+                    <div
+                        className="login-modal-overlay"
+                        onClick={handleCloseLoginModal}
+                    >
+                        <div
+                            className="login-modal"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3>로그인이 필요합니다</h3>
+                            <button className="chat-login-btn" onClick={handleDoLogin}>
+                                간편 로그인
+                            </button>
+                            <button
+                                className="chat-login-btn chat-login-cancel"
+                                onClick={handleCloseLoginModal}
+                            >
+                                취소
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
