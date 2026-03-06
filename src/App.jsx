@@ -8,6 +8,8 @@ import MyPage from "./components/userInterface/member/myPage";
 import TeamDetails from "./components/userInterface/teams/TeamDetails";
 import { AuthProvider } from "./provider/AuthProvider";
 import OauthSuccess from "./components/userInterface/member/OauthSuccess";
+import FindPassword from "./components/userInterface/member/ChangePassword";
+import ChangePassword from "./components/userInterface/member/ChangePassword";
 
 function App() {
   return (
@@ -21,6 +23,7 @@ function App() {
             <Route path="/community/:id" element={<UserMain />} />
             <Route path="/teamDetails" element={<TeamDetails />} />
             <Route path="/oauth/success" element={<OauthSuccess />} />
+            <Route path="/changePassword" element={<ChangePassword />} />
           </Route>
           <Route path="/admin" element={<AdminLayout />}></Route>
         </Routes>

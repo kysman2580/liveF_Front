@@ -55,8 +55,21 @@ const MyPage = () => {
         setIsEditing(false);
       })
       .catch((error) => {
-        console.error("회원정보 수정 실패:", error);
-        alert("회원 정보 수정 중 오류가 발생했습니다.");
+        console.error("❌ 회원정보 수정 에러:", error);
+        const responseData = error.response?.data;
+
+        const getValidationMessage = (data) => {
+          if (!data) return null;
+          if (typeof data === "string") return data;
+          const errorList = data.errors || data.data?.errors;
+          if (Array.isArray(errorList) && errorList.length > 0) {
+            return errorList[0].defaultMessage || errorList[0].message;
+          }
+          return data.message || data.data?.message || data.error || data.errorMessage;
+        };
+
+        const errorMsg = getValidationMessage(responseData);
+        alert(errorMsg || "회원 정보 수정 중 오류가 발생했습니다.");
       });
   };
 

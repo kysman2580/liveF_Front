@@ -1,4 +1,77 @@
+:root {
+  /* Theme tokens - single neutral primary (no gradients) */
+  --primary: #2563eb; /* 무난한 블루 */
+  --primary-weak: rgba(37, 99, 235, 0.08);
+  --text: #222222;
+  --muted: #6b7280;
+  --bg: #f0f2f5; /* 시인성 및 프리미엄 느낌을 위해 배경색 조정 */
+  --card-radius: 12px;
+  --container-max-width: 1400px; /* 더 넓은 화면 활용을 위해 확장 */
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Global background and container for Option A (soft-blue) */
+body {
+  background: var(--bg); /* 변수 사용으로 통일성 확보 */
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.left-col {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  height: fit-content;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr; /* 사이드바 순위표를 위해 너비 확장 */
+  gap: 40px;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+.app-main {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 30px 50px;
+}
+
+.right-col {
+  display: none; /* 고정 컬럼 제거 */
+}
+
+/* Make left sidebar and right column blend with page background (no white card) */
+.layout-grid .left-col .c-sidebar,
+.layout-grid .left-col .c-sidebar * {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.layout-grid .right-col {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Gentle card defaults to improve consistency */
+section {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05); /* 조금 더 부드럽고 명확한 그림자 */
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+/* Utility for floated panel look */
+.panel-floating {
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(11, 35, 64, 0.06);
+}

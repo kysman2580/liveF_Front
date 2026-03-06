@@ -2,10 +2,7 @@
 import styled, { css } from "styled-components";
 
 export const Hero = styled.header`
-  background: ${({ $primary }) =>
-    $primary
-      ? `linear-gradient(180deg, ${$primary} 0%, #ffffff 100%)`
-      : "#f9fafb"};
+  background: ${({ $primary }) => ($primary ? $primary : "#f9fafb")};
   padding: 20px 0 16px;
 `;
 

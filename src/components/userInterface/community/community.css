@@ -53,7 +53,7 @@
   background: #fff;
   border: 1.5px solid #e3e6ef;
   border-radius: 16px;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
   width: 120px;
   min-width: 100px;
   padding: 22px 0 18px 0;
@@ -72,13 +72,13 @@
 .detail-count-value {
   font-size: 1.32rem;
   font-weight: 700;
-  color: #7b61ff;
+  color: var(--primary);
   margin-top: 4px;
 }
-.detail-wrap{
+.detail-wrap {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
   padding: 24px 30px 18px 30px;
   margin-bottom: 28px;
   height: 440px;
@@ -88,7 +88,7 @@
 .comment-write-card {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
   padding: 24px 30px 18px 30px;
   margin-bottom: 28px;
 }
@@ -141,7 +141,7 @@
 .comment-card {
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
   padding: 18px 22px 14px 22px;
   position: relative;
 }
@@ -158,7 +158,7 @@
   width: 32px;
   height: 32px;
   background: #e3e6ef;
-  color: #7b61ff;
+  color: var(--primary);
   font-weight: 700;
   font-size: 1.15rem;
   border-radius: 50%;
@@ -172,7 +172,7 @@
 }
 .comment-user-name {
   font-weight: 600;
-  color: #7b61ff;
+  color: var(--primary);
   margin-right: 8px;
 }
 .comment-time {
@@ -199,7 +199,7 @@
   transition: color 0.18s;
 }
 .comment-action-btn:hover {
-  color: #7b61ff;
+  color: var(--primary);
 }
 
 /* 대댓글 카드 */
@@ -235,11 +235,13 @@
   padding: 18px 0;
 }
 .select-input {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-.community-write-input, .community-write-textarea, .community-write-form select {
+.community-write-input,
+.community-write-textarea,
+.community-write-form select {
   padding: 10px 16px;
   border: 1.5px solid #e5e7eb;
   border-radius: 12px;
@@ -249,17 +251,19 @@
   transition: border 0.15s;
   margin-bottom: 2px;
 }
-.community-write-input:focus, .community-write-textarea:focus, .community-write-form select:focus {
+.community-write-input:focus,
+.community-write-textarea:focus,
+.community-write-form select:focus {
   border-color: #7b61ff;
 }
 .community-write-textarea {
-    min-height: 180px;
-    max-height: 380px;
-    resize: vertical;
-    font-size: 1.08rem;
-    line-height: 1.7;
-    max-width: 592px;
-    width: 592px;
+  min-height: 180px;
+  max-height: 380px;
+  resize: vertical;
+  font-size: 1.08rem;
+  line-height: 1.7;
+  max-width: 592px;
+  width: 592px;
 }
 
 .community-write-title {
@@ -296,7 +300,7 @@
   padding: 8px 22px;
   font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 2px 8px 0 rgba(123,97,255,0.10);
+  box-shadow: 0 2px 8px 0 rgba(123, 97, 255, 0.1);
   transition: background 0.18s;
 }
 .community-write-submit:hover {
@@ -304,7 +308,10 @@
 }
 .community-modal-bg {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(40, 30, 80, 0.18);
   z-index: 1000;
   display: flex;
@@ -312,19 +319,25 @@
   justify-content: center;
 }
 .community-modal {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 32px 0 rgba(123,97,255,0.13);
-    padding: 54px 64px 44px 64px;
-    min-width: 480px;
-    max-width: 720px;
-    width: 100%;
-    position: relative;
-    animation: modalFadeIn 0.22s;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(123, 97, 255, 0.13);
+  padding: 54px 64px 44px 64px;
+  min-width: 480px;
+  max-width: 720px;
+  width: 100%;
+  position: relative;
+  animation: modalFadeIn 0.22s;
 }
 @keyframes modalFadeIn {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .community-modal-close {
   position: absolute;
@@ -352,7 +365,13 @@
 }
 .community-detail-content {
   border-top: solid 1px gray;
-  border-image: linear-gradient(to right, transparent 0%, #d7d7d7 50%, transparent 100%) 1;
+  border-image: linear-gradient(
+      to right,
+      transparent 0%,
+      #d7d7d7 50%,
+      transparent 100%
+    )
+    1;
   padding: 30px 0;
 }
 .community-detail-meta {
@@ -406,7 +425,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 36px 0 60px 0;
-  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
 }
 .community-header {
   margin-bottom: 24px;
@@ -472,7 +491,7 @@
   padding: 10px 22px;
   font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 2px 8px 0 rgba(123,97,255,0.10);
+  box-shadow: 0 2px 8px 0 rgba(123, 97, 255, 0.1);
   transition: background 0.18s;
 }
 .community-write-btn:hover {
@@ -495,7 +514,8 @@
   cursor: pointer;
   transition: background 0.15s, border 0.15s, color 0.15s;
 }
-.community-category-btn.selected, .community-category-btn:hover {
+.community-category-btn.selected,
+.community-category-btn:hover {
   background: linear-gradient(90deg, #7b61ff 0%, #5fd3fa 100%);
   color: #fff;
 }
@@ -508,7 +528,7 @@
 .community-post {
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.07);
   padding: 24px 30px 18px 30px;
   display: flex;
   flex-direction: column;
@@ -517,7 +537,7 @@
   position: relative;
 }
 .community-post:hover {
-  box-shadow: 0 8px 32px 0 rgba(123,97,255,0.13);
+  box-shadow: 0 8px 32px 0 rgba(123, 97, 255, 0.13);
   transform: translateY(-4px) scale(1.03);
 }
 .community-post:hover .community-post-title {
@@ -609,23 +629,21 @@
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-.community-page-btn.selected, .community-page-btn:hover {
+.community-page-btn.selected,
+.community-page-btn:hover {
   background: linear-gradient(90deg, #7b61ff 0%, #5fd3fa 100%);
   color: #fff;
 }
 
-
-.detail-action-card{
+.detail-action-card {
   margin-top: 20px;
 }
 
-
 .community-detail-actions {
-    display: flex;
-    justify-content: center;
-    border-top: solid 1px #d7d7d7;
+  display: flex;
+  justify-content: center;
+  border-top: solid 1px #d7d7d7;
 }
-
 
 button.community-back-btn {
   border: solid 1px #dedede;

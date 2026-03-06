@@ -49,7 +49,32 @@ const SignUp = ({ setOpenSignUpModal }) => {
         navi("/");
       })
       .catch((error) => {
-        console.error("There was an error!", error);
+        console.error("❌ 회원가입 에러 상세:", error);
+        const responseData = error.response?.data;
+        console.log("📦 에러 응답 데이터:", responseData);
+
+        // 상세 에러 메시지 추출 (다양한 서버 응답 구조 대응)
+        const getValidationMessage = (data) => {
+          if (!data) return null;
+          if (typeof data === "string") return data;
+
+          // 1. Spring Validation errors 배열 확인
+          const errorList = data.errors || data.data?.errors;
+          if (Array.isArray(errorList) && errorList.length > 0) {
+            return errorList[0].defaultMessage || errorList[0].message;
+          }
+
+          // 2. 공통 응답 객체의 message 필드 확인
+          return data.message || data.data?.message || data.error || data.errorMessage;
+        };
+
+        const message = getValidationMessage(responseData);
+
+        if (message) {
+          alert(message);
+        } else {
+          alert("회원가입에 실패했습니다. (서버 응답이 없거나 알 수 없는 형식입니다.)");
+        }
       });
   };
 

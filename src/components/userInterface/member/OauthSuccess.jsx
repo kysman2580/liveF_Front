@@ -1,27 +1,32 @@
 import { useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../provider/AuthProvider";
+import axios from "../../../api/AxiosInterceptor";
 
 const OauthSuccess = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/member/myInfo", { withCredentials: true })
-      .then((res) => {
-        console.log("카카오 로그인 사용자:", res.data);
-        login(res.data.data.member); // 전역 상태에 로그인 정보 저장
-        navigate("/"); // 메인으로 이동
-      })
-      .catch((err) => {
-        console.error("로그인 정보 확인 실패:", err);
-        navigate("/login");
-      });
+    // 쿠키가 브라우저에 저장될 시간 확보
+    const timer = setTimeout(() => {
+      axios
+        .get("/api/member/myInfo", { withCredentials: true })
+        .then((res) => {
+          console.log("카카오 로그인 사용자:", res.data);
+          login(res.data.data.member);
+          navigate("/");
+        })
+        .catch((err) => {
+          console.error("로그인 정보 확인 실패:", err);
+          navigate("/login");
+        });
+    }, 500); // 0.5초 지연
+
+    return () => clearTimeout(timer);
   }, []);
 
-  return <div>로그인 중입니다... 잠시만 기다려주세요 😊</div>;
+  return;
 };
+
 export default OauthSuccess;
-SVGAnimateElement;

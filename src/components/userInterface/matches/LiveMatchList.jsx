@@ -1,215 +1,501 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import LiveChatBox from './LiveChatBox.jsx';
-import { useLocation } from 'react-router-dom';
-import './LiveMatchList.css';
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
+import "./LiveMatchList.css";
+import {
+    allMatches,
+    getTeamLogo,
+    teamKoreanNames,
+} from "../../../utils/mockData";
 
-const DEFAULT_LEAGUE_ID = 39; // 기본 리그: Premier League
-const API_URL = URL_CONFIG.API_URL; // 환경 변수로 설정된 API URL
+const DEFAULT_LEAGUE_ID = 39;
+const API_URL = URL_CONFIG.API_URL;
 const PAGE_SIZE = 6;
+
+const USE_MOCK = false;
+
+const getMatchDay = (dateStr, timeStr) => {
+    // 🔍 유효성 검사 강화
+    if (!dateStr || dateStr === 'null' || dateStr === 'undefined') {
+        return null; // 또는 "날짜미정"
+    }
+
+    if (!timeStr) {
+        return dateStr; // 시간이 없으면 날짜만 반환
+    }
+
+    try {
+        const [year, month, day] = dateStr.split("-").map(Number);
+        const [hour] = timeStr.split(":").map(Number);
+
+        // 새벽 0시 ~ 5시 59분 경기는 전날로 분류
+        if (hour < 6) {
+            const date = new Date(year, month - 1, day);
+            date.setDate(date.getDate() - 1);
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+            return `${y}-${m}-${d}`;
+        }
+
+        return dateStr;
+    } catch (error) {
+        console.error("getMatchDay 오류:", dateStr, timeStr, error);
+        return null;
+    }
+};
+
+const formatDateDisplay = (dateStr) => {
+    if (!dateStr) return "--";
+    return dateStr.substring(5, 10).replace("-", "/");
+};
+
+const getRelativeDateText = (dateStr, today) => {
+    if (dateStr === today) return "오늘";
+
+    const date = new Date(dateStr);
+    const todayDate = new Date(today);
+    const diffDays = Math.floor((date - todayDate) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === -1) return "어제";
+    if (diffDays === 1) return "내일";
+
+    return formatDateDisplay(dateStr);
+};
+
+const sortMatchesByDateAsc = (a, b) => {
+    if (a.date < b.date) return -1;
+    if (a.date > b.date) return 1;
+    if (a.time < b.time) return -1;
+    if (a.time > b.time) return 1;
+    return 0;
+};
 
 const LiveMatchList = () => {
     const [matches, setMatches] = useState([]);
-    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const [modalMatch, setModalMatch] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const location = useLocation();
 
-    // 로그인 상태 관리
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loginModal, setLoginModal] = useState(false);
-    const [currentUser, setCurrentUser] = useState('익명'); // 사용자명
+    const [currentUser, setCurrentUser] = useState("익명");
 
     const handleLoginClick = () => setLoginModal(true);
 
     const handleDoLogin = () => {
         setIsLoggedIn(true);
-        // 임시 사용자명 생성 (실제로는 로그인 API에서 받아와야 함)
-        setCurrentUser('사용자' + Math.floor(Math.random() * 1000));
+        setCurrentUser("사용자" + Math.floor(Math.random() * 1000));
         setLoginModal(false);
     };
 
     const handleCloseLoginModal = () => setLoginModal(false);
 
-    // 현재 리그 ID 추출
     const queryParams = new URLSearchParams(location.search);
-    const currentLeagueId = parseInt(queryParams.get('leagueId') || DEFAULT_LEAGUE_ID);
+    const currentLeagueId = parseInt(
+        queryParams.get("leagueId") || DEFAULT_LEAGUE_ID
+    );
+
+    const convertMockToApiFormat = (mockMatches) => {
+        return mockMatches.map((match) => {
+            const matchDay = getMatchDay(match.date, match.startTime);
+
+            return {
+                fixtureId: match.id,
+                date: match.date,
+                fixtureDate: match.date,
+                time: match.startTime,
+                matchDay: matchDay, // 경기일
+                status: match.status,
+                homeTeamName: teamKoreanNames[match.homeTeam] || match.homeTeam,
+                awayTeamName: teamKoreanNames[match.awayTeam] || match.awayTeam,
+                homeTeamLogoUrl: getTeamLogo(match.homeTeam),
+                awayTeamLogoUrl: getTeamLogo(match.awayTeam),
+                score:
+                    match.homeScore !== null && match.awayScore !== null
+                        ? `${match.homeScore} - ${match.awayScore}`
+                        : "0 - 0",
+                venue: match.stadium,
+                leagueName: match.league,
+            };
+        });
+    };
 
     useEffect(() => {
         setLoading(true);
 
-        axios.get(`${API_URL}/api/v1/feed/fixtures?leagueId=${currentLeagueId}`)
-            .then(res => {
-                setMatches(Array.isArray(res.data) ? res.data : []);
+        if (USE_MOCK) {
+            console.log("📦 Mock 데이터 로딩 중...");
+            setTimeout(() => {
+                let convertedData = convertMockToApiFormat(allMatches);
+                convertedData = convertedData.sort(sortMatchesByDateAsc);
+
+                setMatches(convertedData);
                 setError(null);
-            })
-            .catch(error => {
-                console.error("Error fetching fixtures:", error);
-                setMatches([]);
-                setError('경기 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
-            })
-            .finally(() => {
                 setLoading(false);
-            });
+                console.log("✅ Mock 데이터 로드 완료:", convertedData);
+            }, 500);
+        } else {
+            axios
+                .get(`${API_URL}/api/v1/feed/fixtures?leagueId=${currentLeagueId}`)
+                .then((res) => {
+                    let fetchedData = Array.isArray(res.data) ? res.data : [];
+
+                    fetchedData = fetchedData.map((match) => {
+                        // kickoffTime 변환
+                        let matchDate = null;
+                        let matchTime = null;
+
+                        if (match.kickoffTime && Array.isArray(match.kickoffTime)) {
+                            const [year, month, day, hour, minute] = match.kickoffTime;
+                            matchDate = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                            matchTime = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+                        }
+
+                        // 🔥 score 파싱 ("5 - 1" → homeScore: 5, awayScore: 1)
+                        let homeScore = null;
+                        let awayScore = null;
+
+                        if (match.score && typeof match.score === 'string') {
+                            const scores = match.score.split('-').map(s => s.trim());
+                            if (scores.length === 2) {
+                                const parsedHome = parseInt(scores[0]);
+                                const parsedAway = parseInt(scores[1]);
+                                homeScore = isNaN(parsedHome) ? null : parsedHome;
+                                awayScore = isNaN(parsedAway) ? null : parsedAway;
+                            }
+                        }
+
+                        return {
+                            ...match,
+                            date: matchDate,
+                            time: matchTime,
+                            matchDay: getMatchDay(matchDate, matchTime),
+                            homeScore,
+                            awayScore,
+                        };
+                    });
+
+                    fetchedData = fetchedData.sort(sortMatchesByDateAsc);
+
+                    setMatches(fetchedData);
+                    setError(null);
+                })
+                .catch((error) => {
+                    console.error("Error fetching fixtures:", error);
+                    setMatches([]);
+                    setError(
+                        "경기 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요."
+                    );
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
     }, [location.search, currentLeagueId]);
 
-    const handleShowMore = useCallback(() => {
-        setVisibleCount((prev) => prev + PAGE_SIZE);
-    }, []);
+    const getTodayMatchDay = () => {
+        const now = new Date();
+        const hour = now.getHours();
 
-    const visibleMatches = Array.isArray(matches) ? matches.slice(0, visibleCount) : [];
+        // 새벽 0~5시면 어제로 간주
+        if (hour < 6) {
+            now.setDate(now.getDate() - 1);
+        }
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const d = String(now.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+    };
+
+    const getGroupedMatches = () => {
+        if (!Array.isArray(matches)) return {};
+
+        const grouped = {};
+        matches.forEach((match) => {
+            const matchDay = match.matchDay || match.date || "날짜미정";
+
+            if (!grouped[matchDay]) {
+                grouped[matchDay] = [];
+            }
+            grouped[matchDay].push(match);
+        });
+
+        return grouped;
+    };
+
+
+    const formatDateHeader = (dateStr) => {
+        if (!dateStr || dateStr === 'undefined') return "날짜 미정";
+
+        try {
+            const [year, month, day] = dateStr.split("-");
+            if (!month || !day) return "날짜 미정";
+            return `${month}/${day}`;
+        } catch (error) {
+            console.error("날짜 포맷 오류:", dateStr, error);
+            return "날짜 미정";
+        }
+    };
+
+    const [selectedDate, setSelectedDate] = useState(getTodayMatchDay());
 
     const handleCardClick = (match) => setModalMatch(match);
     const handleCloseModal = () => setModalMatch(null);
 
+    const getDatesToDisplay = () => {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const formatDate = (date) => {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const d = String(date.getDate()).padStart(2, "0");
+            return `${y}-${m}-${d}`;
+        };
+
+        return [
+            { id: formatDate(yesterday), label: "어제", date: formatDate(yesterday) },
+            { id: formatDate(today), label: "오늘", date: formatDate(today) },
+            { id: formatDate(tomorrow), label: "내일", date: formatDate(tomorrow) },
+        ];
+    };
+
+    const dateTabs = getDatesToDisplay();
+    const groupedMatches = getGroupedMatches();
+    const displayedMatches = groupedMatches[selectedDate] || [];
+
     return (
-        <div className="LiveMatchListWrap" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-            {/* 경기 목록 */}
-            <div className="LiveMatchList" style={{ flex: 1 }}>
-                {loading ? (
-                    <div className="no-matches">경기 정보를 불러오는 중...</div>
-                ) : error ? (
-                    <div className="no-matches" style={{ color: 'red' }}>{error}</div>
-                ) : matches.length === 0 ? (
-                    <div className="no-matches">경기 정보가 없습니다.</div>
-                ) : (
-                    <>
-                        {visibleMatches.map(match => (
-                            <div
-                                className="LiveMatchCard"
-                                key={match.fixtureId || Math.random()}
-                                tabIndex={0}
-                                onClick={() => handleCardClick(match)}
-                                onKeyDown={e => { if (e.key === 'Enter') handleCardClick(match); }}
-                                style={{ cursor: 'pointer', position: 'relative' }}
+        <div
+            className="LiveMatchListWrap"
+            style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "flex-start",
+            }}
+        >
+            <div style={{ flex: 1 }}>
+                {/* 날짜 내비게이션 */}
+                <div className="date-navigation">
+                    {dateTabs.map((tab) => (
+                        <div
+                            key={tab.id}
+                            className={`date-tab ${selectedDate === tab.date ? "active" : ""}`}
+                            onClick={() => setSelectedDate(tab.date)}
+                        >
+                            {groupedMatches[tab.date]?.length > 0 && (
+                                <div className="match-indicator-dot" title="경기가 있는 날입니다"></div>
+                            )}
+                            <span className="date-tab-label">{tab.label}</span>
+                            <span className="date-tab-sublabel">{formatDateHeader(tab.date)}</span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* 경기 목록 */}
+                <div className="LiveMatchList">
+                    {loading ? (
+                        <div className="no-matches">경기 정보를 불러오는 중...</div>
+                    ) : error ? (
+                        <div className="no-matches" style={{ color: "red" }}>
+                            {error}
+                        </div>
+                    ) : displayedMatches.length === 0 ? (
+                        <div className="no-matches">선택한 날짜에 예정된 경기가 없습니다.</div>
+                    ) : (
+                        <>
+                            {/* 선택된 날짜의 경기 카드들 */}
+                            {displayedMatches.map((match) => (
+                                <div
+                                    className="LiveMatchCard"
+                                    key={match.fixtureId || Math.random()}
+                                    tabIndex={0}
+                                    onClick={() => handleCardClick(match)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleCardClick(match);
+                                    }}
+                                    style={{ cursor: "pointer", position: "relative" }}
+                                >
+                                    <div className="card-gradient" />
+                                    <div className="card-content">
+                                        <div className="lmc-top-row">
+                                            <span className={`lmc-badge ${['LIVE', '1H', '2H', 'HT'].includes(match.status) ? 'live' : ''}`}>
+                                                <span className="lmc-badge-dot"></span>
+                                                {match.status || "NS"}
+                                            </span>
+                                            <div className="lmc-time">
+                                                <span className="font-medium">
+                                                    {match.time || "--"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="lmc-main">
+                                            <div className="lmc-team-row">
+                                                {/* 홈 팀 블록 */}
+                                                <div className="lmc-team-block">
+                                                    <div className="lmc-team-logo-inner">
+                                                        {match.homeTeamLogoUrl && (
+                                                            <img
+                                                                src={
+                                                                    match.homeTeamLogoUrl ||
+                                                                    "/placeholder.svg"
+                                                                }
+                                                                alt={`${match.homeTeamName || "Unknown"} 로고`}
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "contain",
+                                                                    borderRadius: "6px",
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div className="lmc-team-info">
+                                                        <div className="lmc-team-name">
+                                                            {match.homeTeamName || "Unknown"}
+                                                        </div>
+                                                        <div className="lmc-team-type">홈</div>
+                                                    </div>
+                                                </div>
+                                                {/* 🌟 수정된 부분: match.homeScore 사용 */}
+                                                <div className="lmc-score">
+                                                    {match.homeScore !== null ? match.homeScore : "-"}
+                                                </div>
+                                            </div>
+                                            <div className="lmc-vs-row">
+                                                <div className="lmc-vs-line"></div>
+                                                <span className="lmc-vs">VS</span>
+                                                <div className="lmc-vs-line"></div>
+                                            </div>
+                                            <div className="lmc-team-row">
+                                                {/* 원정 팀 블록 */}
+                                                <div className="lmc-team-block">
+                                                    <div className="lmc-team-logo-inner">
+                                                        {match.awayTeamLogoUrl && (
+                                                            <img
+                                                                src={
+                                                                    match.awayTeamLogoUrl ||
+                                                                    "/placeholder.svg"
+                                                                }
+                                                                alt={`${match.awayTeamName || "Unknown"} 로고`}
+                                                                style={{
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "contain",
+                                                                    borderRadius: "6px",
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div className="lmc-team-info">
+                                                        <div className="lmc-team-name">
+                                                            {match.awayTeamName || "Unknown"}
+                                                        </div>
+                                                        <div className="lmc-team-type">어웨이</div>
+                                                    </div>
+                                                </div>
+                                                {/* 🌟 수정된 부분: match.awayScore 사용 */}
+                                                <div className="lmc-score">
+                                                    {match.awayScore !== null ? match.awayScore : "-"}
+                                                </div>
+                                            </div>
+                                            <div className="lmc-stadium-row">
+                                                <span className="lmc-stadium-name">
+                                                    {match.venue || "-"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </>
+                    )}
+                </div>
+                {modalMatch && (
+                    <div className="MatchModalOverlay" onClick={handleCloseModal}>
+                        <div
+                            className="MatchModal"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                className="close-modal-btn"
+                                onClick={handleCloseModal}
                             >
-                                <div className="card-gradient" />
-                                <div className="card-content">
-                                    <div className="lmc-top-row">
-                                        <span className="lmc-badge">
-                                            <span className="lmc-badge-dot"></span>
-                                            {match.status || 'NS'}
-                                        </span>
-                                        <div className="lmc-time">
-                                            <span className="font-medium">{match.time || '--'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="lmc-main">
-                                        <div className="lmc-team-row">
-                                            <div className="lmc-team-block">
-                                                <div className="lmc-team-logo-inner">
-                                                    {match.homeTeamLogoUrl && (
-                                                        <img
-                                                            src={match.homeTeamLogoUrl}
-                                                            alt={`${match.homeTeamName || 'Unknown'} 로고`}
-                                                            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }}
-                                                        />
-                                                    )}
-                                                </div>
-                                                <div className="lmc-team-info">
-                                                    <div className="lmc-team-name">{match.homeTeamName || 'Unknown'}</div>
-                                                    <div className="lmc-team-type">홈</div>
-                                                </div>
-                                            </div>
-                                            <div className="lmc-score">{match.score ? match.score.split(' - ')[0] || '-' : '-'}</div>
-                                        </div>
-                                        <div className="lmc-vs-row">
-                                            <div className="lmc-vs-line"></div>
-                                            <span className="lmc-vs">VS</span>
-                                            <div className="lmc-vs-line"></div>
-                                        </div>
-                                        <div className="lmc-team-row">
-                                            <div className="lmc-team-block">
-                                                <div className="lmc-team-logo-inner">
-                                                    {match.awayTeamLogoUrl && (
-                                                        <img
-                                                            src={match.awayTeamLogoUrl}
-                                                            alt={`${match.awayTeamName || 'Unknown'} 로고`}
-                                                            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px' }}
-                                                        />
-                                                    )}
-                                                </div>
-                                                <div className="lmc-team-info">
-                                                    <div className="lmc-team-name">{match.awayTeamName || 'Unknown'}</div>
-                                                    <div className="lmc-team-type">어웨이</div>
-                                                </div>
-                                            </div>
-                                            <div className="lmc-score">{match.score ? match.score.split(' - ')[1] || '-' : '-'}</div>
-                                        </div>
-                                    </div>
-                                    <div className="lmc-stadium-row">
-                                        <span className="lmc-stadium-name">{match.venue || '-'}</span>
-                                    </div>
+                                &times;
+                            </button>
+                            <h2>{modalMatch.leagueName || "Unknown League"}</h2>
+                            <div className="modal-teams modal-teams-logos">
+                                <div className="modal-team-block">
+                                    {modalMatch.homeTeamLogoUrl && (
+                                        <img
+                                            src={
+                                                modalMatch.homeTeamLogoUrl || "/placeholder.svg"
+                                            }
+                                            alt={`${modalMatch.homeTeamName || "Unknown"} 로고`}
+                                            className="modal-team-logo"
+                                        />
+                                    )}
+                                    <span className="modal-team-ko">
+                                        {modalMatch.homeTeamName || "Unknown"}
+                                    </span>
+                                </div>
+                                <span className="modal-score">
+                                    {modalMatch.score || "0 - 0"}
+                                </span>
+                                <div className="modal-team-block">
+                                    {modalMatch.awayTeamLogoUrl && (
+                                        <img
+                                            src={
+                                                modalMatch.awayTeamLogoUrl || "/placeholder.svg"
+                                            }
+                                            alt={`${modalMatch.awayTeamName || "Unknown"} 로고`}
+                                            className="modal-team-logo"
+                                        />
+                                    )}
+                                    <span className="modal-team-ko">
+                                        {modalMatch.awayTeamName || "Unknown"}
+                                    </span>
                                 </div>
                             </div>
-                        ))}
-
-                        {visibleCount < matches.length && (
-                            <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center' }}>
-                                <button className="show-more-btn" onClick={handleShowMore}>경기 더보기</button>
-                            </div>
-                        )}
-
-                        {/* 경기 상세 모달 */}
-                        {modalMatch && (
-                            <div className="MatchModalOverlay" onClick={handleCloseModal}>
-                                <div className="MatchModal" onClick={e => e.stopPropagation()}>
-                                    <button className="close-modal-btn" onClick={handleCloseModal}>&times;</button>
-                                    <h2>{modalMatch.leagueName || 'Unknown League'}</h2>
-                                    <div className="modal-teams modal-teams-logos">
-                                        <div className="modal-team-block">
-                                            {modalMatch.homeTeamLogoUrl && (
-                                                <img
-                                                    src={modalMatch.homeTeamLogoUrl}
-                                                    alt={`${modalMatch.homeTeamName || 'Unknown'} 로고`}
-                                                    className="modal-team-logo"
-                                                />
-                                            )}
-                                            <span className="modal-team-ko">{modalMatch.homeTeamName || 'Unknown'}</span>
-                                        </div>
-                                        <span className="modal-score">{modalMatch.score || '0 - 0'}</span>
-                                        <div className="modal-team-block">
-                                            {modalMatch.awayTeamLogoUrl && (
-                                                <img
-                                                    src={modalMatch.awayTeamLogoUrl}
-                                                    alt={`${modalMatch.awayTeamName || 'Unknown'} 로고`}
-                                                    className="modal-team-logo"
-                                                />
-                                            )}
-                                            <span className="modal-team-ko">{modalMatch.awayTeamName || 'Unknown'}</span>
-                                        </div>
-                                    </div>
-                                    <div className="modal-info">
-                                        <div><span>경기 상태</span> <b>{modalMatch.status || 'NS'}</b></div>
-                                        <div><span>경기장</span> <b>{modalMatch.venue || '-'}</b></div>
-                                    </div>
+                            <div className="modal-info">
+                                <div>
+                                    <span>경기 상태</span>{" "}
+                                    <b>{modalMatch.status || "NS"}</b>
+                                </div>
+                                <div>
+                                    <span>경기장</span> <b>{modalMatch.venue || "-"}</b>
                                 </div>
                             </div>
-                        )}
-
-                        {/* 로그인 모달 */}
-                        {loginModal && (
-                            <div className="login-modal-overlay" onClick={handleCloseLoginModal}>
-                                <div className="login-modal" onClick={e => e.stopPropagation()}>
-                                    <h3>로그인이 필요합니다</h3>
-                                    <button className="chat-login-btn" onClick={handleDoLogin}>간편 로그인</button>
-                                    <button className="chat-login-btn chat-login-cancel" onClick={handleCloseLoginModal}>취소</button>
-                                </div>
-                            </div>
-                        )}
-                    </>
+                        </div>
+                    </div>
                 )}
-            </div>
 
-            {/* 채팅창 - 리그ID 전달 ⭐ 핵심 변경 부분! */}
-            <div className="LiveMatchChatAside" style={{ minWidth: 340, marginLeft: 32 }}>
-                <LiveChatBox
-                    leagueId={currentLeagueId}      // ← match 대신 leagueId 전달!
-                    isLoggedIn={isLoggedIn}
-                    onLoginClick={handleLoginClick}
-                    currentUser={currentUser}       // ← 사용자명 전달
-                />
+                {loginModal && (
+                    <div
+                        className="login-modal-overlay"
+                        onClick={handleCloseLoginModal}
+                    >
+                        <div
+                            className="login-modal"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3>로그인이 필요합니다</h3>
+                            <button className="chat-login-btn" onClick={handleDoLogin}>
+                                간편 로그인
+                            </button>
+                            <button
+                                className="chat-login-btn chat-login-cancel"
+                                onClick={handleCloseLoginModal}
+                            >
+                                취소
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

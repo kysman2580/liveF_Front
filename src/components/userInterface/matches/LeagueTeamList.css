@@ -1,59 +1,71 @@
-.team-name-ko {
-  display: block;
-  font-size: 1.08rem;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 2px;
-}
-.team-name-en {
-  display: block;
-  font-size: 0.98rem;
-  color: #6b7280;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-}
-.team-logo {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 8px auto;
-  background: #f7fafd;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px 0 rgba(42, 67, 101, 0.08);
-}
-/* 리그별 팀 카드 리스트 스타일 */
 .LeagueTeamList {
-  margin: 32px 0 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  justify-content: flex-start;
-  max-width: 1000px;
-  width: 1000px;
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
 .TeamCard {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px 0 rgba(42, 67, 101, 0.10);
-  padding: 16px 24px;
-  min-width: 270px;
-  text-align: center;
-  font-size: 1.08rem;
-  font-weight: 500;
-  color: #1a2980;
-  transition: transform 0.12s, box-shadow 0.12s;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0; /* 테두리 명확화 */
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04); /* 그림자 보강 */
 }
+
 .TeamCard:hover {
-  transform: translateY(-4px) scale(1.04);
-  box-shadow: 0 8px 24px 0 rgba(42, 67, 101, 0.18);
-  background: #f7fafd;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+  border-color: #cbd5e1;
+  background: #ffffff;
 }
+
+.team-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  padding: 6px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.team-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.team-name-ko {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.team-name-en {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 .no-teams {
-  color: #aaa;
-  padding: 32px 0;
-  width: 100%;
+  grid-column: 1 / -1;
   text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .LeagueTeamList {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,0 +1,202 @@
+.StandingsContainer {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-top: 20px;
+  border: 1px solid #cbd5e1; /* 대비 확보를 위한 사이드바 테두리 강화 */
+}
+
+.StandingsContainer.compact {
+  margin-top: 10px;
+  border-radius: 12px;
+  box-shadow: none;
+  border: 1px solid #e2e8f0;
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.StandingsContainer.compact::-webkit-scrollbar {
+  width: 4px;
+}
+
+.StandingsContainer.compact::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.StandingsTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.StandingsContainer.compact .StandingsTable th {
+  padding: 10px 8px;
+  font-size: 0.7rem;
+}
+
+.StandingsContainer.compact .StandingsTable td {
+  padding: 8px 8px;
+  font-size: 0.8rem;
+}
+
+.StandingsTable th {
+  background: #f8fafc;
+  padding: 16px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.StandingsTable td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.standing-row:hover {
+  background-color: #f8fafc;
+}
+
+.standing-row:last-child td {
+  border-bottom: none;
+}
+
+/* Rank Styling */
+.td-rank {
+  width: 50px;
+  text-align: center;
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: #f0f2f5;
+  color: #64748b;
+}
+
+/* Champions League spots highlight */
+.rank-1, .rank-2, .rank-3, .rank-4 {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* Team Info */
+.team-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.standings-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.team-names {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-name-ko {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.team-name-en {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Stats Columns */
+.td-played, .td-win, .td-draw, .td-lose, .td-gd, .td-pts {
+  text-align: center;
+  font-weight: 600;
+}
+
+.th-played, .th-win, .th-draw, .th-lose, .th-gd, .th-pts {
+  text-align: center;
+}
+
+.td-pts {
+  color: #0f172a;
+}
+
+.td-gd {
+  color: #64748b;
+}
+
+/* Loading/Error States */
+.standings-loading, .standings-error, .no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.standings-error {
+  color: #ef4444;
+}
+
+/* Development Placeholder Styling */
+.development-placeholder {
+  padding: 80px 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.StandingsContainer.compact .development-placeholder {
+  padding: 40px 20px;
+}
+
+.placeholder-content {
+  max-width: 300px;
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+.placeholder-content h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.placeholder-content p {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@media (max-width: 768px) {
+  .team-name-en, .th-played, .td-played, .th-draw, .td-draw {
+    display: none;
+  }
+}
